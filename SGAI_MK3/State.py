@@ -6,16 +6,12 @@ class State:
     person = None
     location = 0
 
-    def distance(self, other_id):
+    def distance(self, other_id): # gets the distance between two states
         first_coord = self.toCoord(self.location)
         second_coord = self.toCoord(other_id)
-        a = second_coord[0] - first_coord[0]
-        b = second_coord[1] - first_coord[1]
-        a = a * a
-        b = b * a
-        return math.pow(int(a + b), 0.5)
+        return (float)((second_coord[1] - first_coord[1])**2 + (second_coord[0] - first_coord[0])**2)**0.5
 
-    def nearest_zombie(self, B):
+    def nearest_zombie(self, B):  #pretty self explanatory
         smallest_dist = 100
         for state in B.States:
             if state.person != None:
@@ -25,7 +21,7 @@ class State:
                         smallest_dist = d
         return smallest_dist
 
-    def evaluate(self, action, Board):
+    def evaluate(self, action, Board): # decides on the reward for a specific action based on what the board is like (for q learning)
         reward = 0
         reward += self.nearest_zombie() - 3
         if action == "heal":
@@ -39,20 +35,20 @@ class State:
             reward = reward + int(5 * (2 + chance))
         return reward
 
-    def adjacent(self, Board):
+    def adjacent(self, Board):  # returns the four adjacent boxes that are in bounds
         newCoord = Board.toCoord(self.location)
         print(newCoord)
-        moves = [
+        moves = [              #puts all four adjacent locations into moves
             (newCoord[0], newCoord[1] - 1),
             (newCoord[0], newCoord[1] + 1),
             (newCoord[0] - 1, newCoord[1]),
             (newCoord[0] + 1, newCoord[1]),
         ]
         print("moves ", moves)
-        remove = []
+        remove = []  #creates the ones to remove
         for i in range(4):
             move = moves[i]
-            if (
+            if (        #removes all illigal options
                 move[0] < 0
                 or move[0] > Board.columns
                 or move[1] < 0
@@ -64,20 +60,20 @@ class State:
             moves.pop(r)
         return moves
 
-    def clone(self):
+    def clone(self): #clones the state (for the purpose of moving people and zombies)
         if self.person is None:
             return State(self.person, self.location)
         return State(self.person.clone(), self.location)
 
-    def __init__(self, p: Person, i) -> None:
+    def __init__(self, p: Person, i) -> None: # creates the state
         self.person = p
         self.location = i
         pass
 
-    def __eq__(self, __o: object) -> bool:
+    def __eq__(self, __o: object) -> bool: # compares if two states are the same, not just the same person but also the same location
         if type(__o) == State:
             return self.person == __o.person and self.location == __o.location
         return False
 
-    def __ne__(self, __o: object) -> bool:
+    def __ne__(self, __o: object) -> bool: # same as over but not equals
         return not self == __o
