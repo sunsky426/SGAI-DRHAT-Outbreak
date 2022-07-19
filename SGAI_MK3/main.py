@@ -7,44 +7,49 @@ from Enums import *
 
 #define Enums action & direction
 
+# Constants
+ROWS = 6
+COLUMNS = 6
+BORDER = 150  # Number of pixels to offset grid to the top-left side
+CELL_DIMENSIONS = (100, 100)  # Number of pixels (x,y) for each cell
+ACTION_SPACE = (Action.move, Action.bite, Action.heal, Action.kill)
+DIRECTION_SPACE = (Direction.up, Direction.down, Direction.left, Direction.right)
+SELF_PLAY = True  # whether or not a human will be playing
 
-rows = 6
-columns = 6
-bd = (rows, columns)
+# Player role variables
+player_role = "Government"  # Valid options are "Government" and "Zombie"
+roleToRoleNum = {"Government": 1, "Zombie": -1}
+roleToRoleBoolean = {"Government": False, "Zombie": True}
 
-role = "Government"  # valid options are "Government" and "Zombie"
-rn = 1
-if role == "Zombie":
-    rn = -1
-roleToIsZombieMappings = {"Government": False, "Zombie": True}
-GameBoard = Board(bd, rn)
+# Create the game board
+GameBoard = Board((ROWS, COLUMNS), BORDER, CELL_DIMENSIONS, roleToRoleNum[player_role])
 GameBoard.populate()
-print("Board Population: ", GameBoard.population)
-action_space = (Action.move, Action.bite, Action.heal, Action.kill)
-direction_space = (Direction.up, Direction.down, Direction.left, Direction.right)
-running = True
-QTable = []
+
+# Self play variables
 alpha = 0.1
 gamma = 0.6
 epsilon = 0.1
-
-r = rd.uniform(0.0, 1.0)
-
-take_action = []
-
-self_play = True  # Change to false
-playerMoved = False
-
-pygame.init()
 epochs = 1000
 epochs_ran = 0
 Original_Board = GameBoard.clone(GameBoard.States, GameBoard.Player_Role)
-font = pygame.font.SysFont("Comic Sans", 20)
-while running:
-    P = PF.run(GameBoard, bd)
 
-    if self_play:
-        # get events
+
+# Initialize variables
+running = True
+take_action = []
+playerMoved = False
+font = pygame.font.SysFont("Comic Sans", 20)
+
+
+while running:
+    P = PF.run(GameBoard)
+
+    if SELF_PLAY:
+        if not GameBoard.containsPerson(False):
+            PF.display_lose_screen()
+            running = False
+            continue
+        # Event Handling
         for event in P:
             if event.type == pygame.MOUSEBUTTONUP:
                 x, y = pygame.mouse.get_pos()
@@ -55,17 +60,17 @@ while running:
                         take_action.append(Action.heal)
                 elif action == "reset move":
                     take_action = []
-                elif action != None:
+                elif action is not None:
                     idx = GameBoard.toIndex(action)
                     # action is a coordinate
-                    if idx < (rows * columns) and idx > -1:
+                    if idx < (GameBoard.rows * GameBoard.columns) and idx > -1:
                         if Action.move not in take_action and len(take_action) == 0:
                             # make sure that the space is not an empty space or a space of the opposite team
                             # since cannot start a move from those invalid spaces
                             if (
                                 GameBoard.States[idx].person is not None
                                 and GameBoard.States[idx].person.isZombie
-                                == roleToIsZombieMappings[role]
+                                == roleToRoleBoolean[player_role]
                             ):
                                 take_action.append(Action.move)
                             else:
@@ -77,39 +82,40 @@ while running:
             if event.type == pygame.QUIT:
                 running = False
 
-        # display what take action currently is
+        # Display the current action
         PF.screen.blit(
             font.render("Your move is currently:", True, PF.WHITE),
             (800, 400),
         )
         PF.screen.blit(font.render(f"{take_action}", True, PF.WHITE), (800, 450))
 
-        # time for player to do stuff
+        # Action handling
         if len(take_action) > 1:
             if take_action[0] == Action.move:
                 if len(take_action) > 2:
                     directionToMove = PF.direction(take_action[1], take_action[2])
-                    g = False
                     print("goin to ", directionToMove)
-                    g = GameBoard.move(take_action[1], directionToMove)
-                    print(f"did it succeed? {g[0]}")
-                    playerMoved = True
+                    result = GameBoard.move(take_action[1], directionToMove)
+                    print(f"did it succeed? {result[0]}")
+                    if result[0] is not False:
+                        playerMoved = True
                     take_action = []
+
             elif take_action[0] == Action.heal:
                 print("Heal person at ", take_action[1])
-                GameBoard.heal(take_action[1], None)
-                playerMoved = True
+                result = GameBoard.heal(take_action[1], None)
+                if result[0] is not False:
+                    playerMoved = True
                 take_action = []
 
-        # computer turn
+        # Computer turn
         if playerMoved:
-            pygame.display.update()
             playerMoved = False
             take_action = []
             possible_direction = [member for name, member in Direction.__members__.items()]
             print("Enemy turn")
 
-            if role == "Government":
+            if player_role == "Government":
                 possible_actions = [Action.move, Action.bite]
                 computer_role = "Zombie"
             else:
@@ -134,21 +140,18 @@ while running:
                 running = False
                 continue
 
+            # Select the destination coordinates
             move_coord = rd.choice(possible_move_coords)
 
+            # Implement the selected action
             print("action chosen is", action)
             print("move start coord is", move_coord)
-
-            G = False
-            if action == Action.move:
-                G = GameBoard.move(move_coord, direction)
-            elif action == Action.bite:
-                G = GameBoard.bite(move_coord, direction)
-            elif action == Action.heal:
-                G = GameBoard.heal(move_coord, direction)
+            
+            GameBoard.actionToFunction[action](move_coord, direction)
 
             print("stopping")
 
+        # Update the display
         pygame.display.update()
 
     else:
@@ -158,76 +161,69 @@ while running:
         for event in P:
             i = 0
             r = rd.uniform(0.0, 1.0)
-            st = rd.randint(0, len(GameBoard.States))
-            state = QTable[st]
+            st = rd.randint(0, len(GameBoard.States) - 1)
+            state = GameBoard.QTable[st]
+
             if r < gamma:
                 while GameBoard.States[st].person is None:
-                    st = rd.randint(0, len(GameBoard.States))
+                    st = rd.randint(0, len(GameBoard.States) - 1)
             else:
                 biggest = None
                 for x in range(len(GameBoard.States)):
-                    arr = QTable[x]
+                    arr = GameBoard.QTable[x]
                     exp = sum(arr) / len(arr)
                     if biggest is None:
                         biggest = exp
                         i = x
-                    elif biggest < exp and role == "Government":
+                    elif biggest < exp and player_role == "Government":
                         biggest = exp
                         i = x
-                    elif biggest > exp and role != "Government":
+                    elif biggest > exp and player_role != "Government":
                         biggest = exp
                         i = x
-                state = QTable[i]
+                state = GameBoard.QTable[i]
             b = 0
             j = 0
             ind = 0
             for v in state:
-                if v > b and role == "Government":
+                if v > b and player_role == "Government":
                     b = v
                     ind = j
-                elif v < b and role != "Government":
+                elif v < b and player_role != "Government":
                     b = v
                     ind = j
                 j += 1
-            action_to_take = action_space[ind]
+            action_to_take = ACTION_SPACE[ind]
             old_qval = b
             old_state = i
 
+            # Update
+            # Q(S, A) = Q(S, A) + alpha[R + gamma * max_a Q(S', A) - Q(S, A)]
             reward = GameBoard.act(old_state, action_to_take)
             ns = reward[1]
             NewStateAct = GameBoard.QGreedyat(ns)
-            NS = QTable[ns][NewStateAct[0]]
-            QTable[i] = QTable[i] + alpha * (reward[0] + gamma * NS) - QTable[i]
+            NS = GameBoard.QTable[ns][NewStateAct[0]]
+            # GameBoard.QTable[i] = GameBoard.QTable[i] + alpha * (reward[0] + gamma * NS) - GameBoard.QTable[i]
             if GameBoard.num_zombies() == 0:
                 print("winCase")
 
             take_action = []
             print("Enemy turn")
             ta = ""
-            if role == "Government":
+            if player_role == "Government":
                 r = rd.randint(0, 5)
                 while r == 4:
                     r = rd.randint(0, 5)
-                ta = action_space[r]
+                ta = ACTION_SPACE[r]
             else:
                 r = rd.randint(0, 4)
-                ta = action_space[r]
+                ta = ACTION_SPACE[r]
             poss = GameBoard.get_possible_moves(ta, "Zombie")
-            r = rd.randint(0, len(poss) - 1)
-            a = poss[r]
-            G = False
-            if ta == "moveUp":
-                G = GameBoard.moveUp(a)
-            elif ta == "moveDown":
-                G = GameBoard.moveDown(a)
-            elif ta == "moveLeft":
-                G = GameBoard.moveLeft(a)
-            elif ta == "moveRight":
-                G = GameBoard.moveRight(a)
-            elif ta == "bite":
-                G = GameBoard.bite(a)
-            elif ta == "heal":
-                G = GameBoard.heal(a)
+
+            if len(poss) > 0:
+                r = rd.randint(0, len(poss) - 1)
+                a = poss[r]
+                GameBoard.actionToFunction[ta](a)
             if GameBoard.num_zombies() == GameBoard.population:
                 print("loseCase")
             if event.type == pygame.QUIT:
