@@ -1,7 +1,11 @@
+from msilib.schema import Class
 import pygame
 from Board import Board
 import PygameFunctions as PF
 import random as rd
+from Enums import *
+
+#define Enums action & direction
 
 
 rows = 6
@@ -16,7 +20,8 @@ roleToIsZombieMappings = {"Government": False, "Zombie": True}
 GameBoard = Board(bd, rn)
 GameBoard.populate()
 print("Board Population: ", GameBoard.population)
-action_space = ["moveUp", "moveDown", "moveLeft", "moveRight", "heal", "bite"]
+action_space = (Action.move, Action.bite, Action.heal, Action.kill)
+direction_space = (Direction.up, Direction.down, Direction.left, Direction.right)
 running = True
 QTable = []
 alpha = 0.1
@@ -47,14 +52,14 @@ while running:
                 if action == "heal":
                     # only allow healing by itself (prevents things like ['move', (4, 1), 'heal'])
                     if len(take_action) == 0:
-                        take_action.append("heal")
+                        take_action.append(Action.heal)
                 elif action == "reset move":
                     take_action = []
                 elif action != None:
                     idx = GameBoard.toIndex(action)
                     # action is a coordinate
                     if idx < (rows * columns) and idx > -1:
-                        if "move" not in take_action and len(take_action) == 0:
+                        if Action.move not in take_action and len(take_action) == 0:
                             # make sure that the space is not an empty space or a space of the opposite team
                             # since cannot start a move from those invalid spaces
                             if (
@@ -62,7 +67,7 @@ while running:
                                 and GameBoard.States[idx].person.isZombie
                                 == roleToIsZombieMappings[role]
                             ):
-                                take_action.append("move")
+                                take_action.append(Action.move)
                             else:
                                 continue
 
@@ -81,28 +86,18 @@ while running:
 
         # time for player to do stuff
         if len(take_action) > 1:
-            if take_action[0] == "move":
+            if take_action[0] == Action.move:
                 if len(take_action) > 2:
                     directionToMove = PF.direction(take_action[1], take_action[2])
                     g = False
-                    if directionToMove == "moveUp":
-                        print("goin to ", directionToMove)
-                        g = GameBoard.moveUp(take_action[1])
-                    elif directionToMove == "moveDown":
-                        print("goin to ", directionToMove)
-                        g = GameBoard.moveDown(take_action[1])
-                    elif directionToMove == "moveLeft":
-                        print("goin to ", directionToMove)
-                        g = GameBoard.moveLeft(take_action[1])
-                    elif directionToMove == "moveRight":
-                        print("goin to ", directionToMove)
-                        g = GameBoard.moveRight(take_action[1])
+                    print("goin to ", directionToMove)
+                    g = GameBoard.move(take_action[1], directionToMove)
                     print(f"did it succeed? {g[0]}")
                     playerMoved = True
                     take_action = []
-            elif take_action[0] == "heal":
+            elif take_action[0] == Action.heal:
                 print("Heal person at ", take_action[1])
-                GameBoard.heal(take_action[1])
+                GameBoard.heal(take_action[1], None)
                 playerMoved = True
                 take_action = []
 
@@ -111,23 +106,26 @@ while running:
             pygame.display.update()
             playerMoved = False
             take_action = []
+            possible_direction = [member for name, member in Direction.__members__.items()]
             print("Enemy turn")
 
-            possible_actions = [
-                action_space[i]
-                for i in range(6)
-                if (i != 4 and role == "Government") or (i != 5 and role == "Zombie")
-            ]
-            computer_role = "Government"
             if role == "Government":
+                possible_actions = [Action.move, Action.bite]
                 computer_role = "Zombie"
+            else:
+                possible_actions = [Action.move, Action.heal] #Action.kill
+                computer_role = "Government"
 
             possible_move_coords = []
             while len(possible_move_coords) == 0 and len(possible_actions) != 0:
-                action = possible_actions.pop(rd.randint(0, len(possible_actions) - 1))
-                possible_move_coords = GameBoard.get_possible_moves(
-                    action, computer_role
-                )
+                action = rd.choice(possible_actions)
+                possible_actions.remove(action)
+                while len(possible_move_coords) == 0 and len(possible_direction) != 0:
+                    direction = rd.choice(possible_direction)
+                    possible_direction.remove(direction)
+                    possible_move_coords = GameBoard.get_possible_moves(
+                        action, direction, computer_role
+                    )
                 print("possible actions is", possible_actions)
 
             # no valid moves, player wins
@@ -142,18 +140,12 @@ while running:
             print("move start coord is", move_coord)
 
             G = False
-            if action == "moveUp":
-                G = GameBoard.moveUp(move_coord)
-            elif action == "moveDown":
-                G = GameBoard.moveDown(move_coord)
-            elif action == "moveLeft":
-                G = GameBoard.moveLeft(move_coord)
-            elif action == "moveRight":
-                G = GameBoard.moveRight(move_coord)
-            elif action == "bite":
-                G = GameBoard.bite(move_coord)
-            elif action == "heal":
-                G = GameBoard.heal(move_coord)
+            if action == Action.move:
+                G = GameBoard.move(move_coord, direction)
+            elif action == Action.bite:
+                G = GameBoard.bite(move_coord, direction)
+            elif action == Action.heal:
+                G = GameBoard.heal(move_coord, direction)
 
             print("stopping")
 

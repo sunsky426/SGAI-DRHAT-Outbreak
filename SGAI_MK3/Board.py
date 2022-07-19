@@ -3,6 +3,7 @@ from State import State
 import random as rd
 from Person import Person
 from typing import Tuple
+from Enums import *
 
 
 class Board:
@@ -12,7 +13,6 @@ class Board:
     columns = 0
     population = 0
     Player_Role = 0
-    action_space = ["moveUp", "moveDown", "moveLeft", "moveRight", "heal", "bite"]
 
     def __init__(self, dimensions, pr):
         self.rows = dimensions[0]
@@ -23,12 +23,9 @@ class Board:
             self.QTable.append([0] * 6)
 
         self.actionToFunction = {
-            "moveUp": self.moveUp,
-            "moveDown": self.moveDown,
-            "moveLeft": self.moveLeft,
-            "moveRight": self.moveRight,
-            "heal": self.heal,
-            "bite": self.bite,
+            Action.move: self.move,
+            Action.heal: self.heal,
+            Action.bite: self.bite,
         }
 
     def num_zombies(self):
@@ -53,11 +50,12 @@ class Board:
                 return True
         return False
 
-    def get_possible_moves(self, action, role):
+    def get_possible_moves(self, action, direction, role):
         """
         Get the coordinates of people (or zombies) that are able
         to make the specified move.
-        @param action - the action to return possibilities for (options are 'bite', 'moveUp', 'moveDown','moveLeft', 'moveRight', and 'heal')
+        @param action - the action to return possibilities for (options are Action.bite, Action.move, Action.heal, and Action.kil)
+        @param direction - the direction this action is heading (options are Direction.up, Direction.down, Direction.left, Direction.right)
         @param role - either 'Zombie' or 'Government'; helps decide whether an action
         is valid and which people/zombies it applies to
         """
@@ -82,7 +80,7 @@ class Board:
                         changed_states = True
                     elif (
                         state.person.isZombie
-                        and B.actionToFunction[action](B.toCoord(state.location))[0]
+                        and B.actionToFunction[action](B.toCoord(state.location), direction)[0]
                     ):
                         poss.append(B.toCoord(state.location))
                         changed_states = True
@@ -111,7 +109,7 @@ class Board:
                         changed_states = True
                     elif (
                         not state.person.isZombie
-                        and B.actionToFunction[action](B.toCoord(state.location))[0]
+                        and B.actionToFunction[action](B.toCoord(state.location), direction)[0]
                     ):
                         poss.append(B.toCoord(state.location))
                         changed_states = True
@@ -167,8 +165,21 @@ class Board:
 
         return ret
 
-    def move(self, from_coords, new_coords) -> Tuple[bool, int]:
-        start_idx = self.toIndex(from_coords)
+    def move(self, coords, direction) -> Tuple[bool, int]:
+        start_idx = self.toIndex(coords)
+        
+        if direction == Direction.up:
+            new_coords = (coords[0], coords[1] - 1)
+            print(f"going from {coords} to new coords {new_coords}")
+        elif direction == Direction.down:
+            new_coords = (coords[0], coords[1] + 1)
+            print(f"going from {coords} to new coords {new_coords}")
+        elif direction == Direction.left:
+            new_coords = (coords[0] - 1, coords[1])
+            print(f"going from {coords} to new coords {new_coords}")
+        elif direction == Direction.right:
+            new_coords = (coords[0] + 1, coords[1])
+            print(f"going from {coords} to new coords {new_coords}")
 
         # idk why this line is here, but I kept it from the original code just in case
         destination_idx = int(new_coords[0] % self.columns) + int(
@@ -188,26 +199,6 @@ class Board:
             return [False, destination_idx]
         except:
             return [False, destination_idx]
-
-    def moveUp(self, coords) -> Tuple[bool, int]:
-        new_coords = (coords[0], coords[1] - 1)
-        print(f"going from {coords} to new coords {new_coords}")
-        return self.move(coords, new_coords)
-
-    def moveDown(self, coords) -> Tuple[bool, int]:
-        new_coords = (coords[0], coords[1] + 1)
-        print(f"going from {coords} to new coords {new_coords}")
-        return self.move(coords, new_coords)
-
-    def moveLeft(self, coords) -> Tuple[bool, int]:
-        new_coords = (coords[0] - 1, coords[1])
-        print(f"going from {coords} to new coords {new_coords}")
-        return self.move(coords, new_coords)
-
-    def moveRight(self, coords) -> Tuple[bool, int]:
-        new_coords = (coords[0] + 1, coords[1])
-        print(f"going from {coords} to new coords {new_coords}")
-        return self.move(coords, new_coords)
 
     def QGreedyat(self, state_id):
         biggest = self.QTable[state_id][0] * self.Player_Role
@@ -265,7 +256,7 @@ class Board:
                     d = rd.randint(0, len(self.States))
             return d
 
-    def bite(self, coords):
+    def bite(self, coords, direction):
         i = self.toIndex(coords)
         if self.States[i] is None:
             return False
@@ -284,7 +275,7 @@ class Board:
             self.States[i].person = newP
         return [True, i]
 
-    def heal(self, coords):
+    def heal(self, coords, direction):
         i = self.toIndex(coords)
         if self.States[i].person is None:
             return False

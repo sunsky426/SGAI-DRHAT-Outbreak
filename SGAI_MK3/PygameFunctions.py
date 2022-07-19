@@ -1,4 +1,5 @@
 import pygame
+from Enums import Direction
 
 image_assets = [
     "person_normal.png",
@@ -183,10 +184,10 @@ def display_lose_screen():
 
 def direction(coord1, coord2):
     if coord2[1] > coord1[1]:
-        return "moveDown"
+        return Direction.down
     elif coord2[1] < coord1[1]:
-        return "moveUp"
+        return Direction.up
     elif coord2[0] > coord1[0]:
-        return "moveRight"
+        return Direction.right
     elif coord2[0] < coord1[0]:
-        return "moveLeft"
+        return Direction.left
