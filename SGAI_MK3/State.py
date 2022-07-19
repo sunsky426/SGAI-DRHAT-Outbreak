@@ -1,10 +1,13 @@
+from typing import Tuple
 from Person import Person
 import math
 
 
 class State:
-    person = None
-    location = 0
+    def __init__(self, p: Person, i) -> None:
+        self.person = p
+        self.location = i
+        pass
 
     def distance(self, other_id): # gets the distance between two states
         first_coord = self.toCoord(self.location)
@@ -13,17 +16,17 @@ class State:
 
     def nearest_zombie(self, B):  #pretty self explanatory
         smallest_dist = 100
-        for state in B.States:
+        for state in GameBoard.States:
             if state.person != None:
                 if state.person.isZombie:
-                    d = self.distance(state.id)
+                    d = self.distance(GameBoard, state.location)
                     if d < smallest_dist:
                         smallest_dist = d
         return smallest_dist
 
-    def evaluate(self, action, Board): # decides on the reward for a specific action based on what the board is like (for q learning)
+    def evaluate(self, action: str, GameBoard): # decides on the reward for a specific action based on what the board is like (for q learning)
         reward = 0
-        reward += self.nearest_zombie() - 3
+        reward += self.nearest_zombie(GameBoard) - 3
         if action == "heal":
             reward += 5
         elif action == "bite" and self.person.isZombie:
@@ -44,15 +47,14 @@ class State:
             (newCoord[0] - 1, newCoord[1]),
             (newCoord[0] + 1, newCoord[1]),
         ]
-        print("moves ", moves)
         remove = []  #creates the ones to remove
         for i in range(4):
             move = moves[i]
             if (        #removes all illigal options
                 move[0] < 0
-                or move[0] > Board.columns
+                or move[0] > GameBoard.columns
                 or move[1] < 0
-                or move[1] > Board.rows
+                or move[1] > GameBoard.rows
             ):
                 remove.append(i)
         remove.reverse()
@@ -64,11 +66,6 @@ class State:
         if self.person is None:
             return State(self.person, self.location)
         return State(self.person.clone(), self.location)
-
-    def __init__(self, p: Person, i) -> None: # creates the state
-        self.person = p
-        self.location = i
-        pass
 
     def __eq__(self, __o: object) -> bool: # compares if two states are the same, not just the same person but also the same location
         if type(__o) == State:

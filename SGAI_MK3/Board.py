@@ -2,24 +2,27 @@ from tracemalloc import start
 from State import State
 import random as rd
 from Person import Person
-from typing import Tuple
+from typing import List, Tuple
 
 
 class Board:
     #initializing variables
-    States = []
-    QTable = []
-    rows = 0
-    columns = 0
-    population = 0   # total number of people and zombies
-    Player_Role = 0  # 1 if gov't, -1 if zombies
-    action_space = ["moveUp", "moveDown", "moveLeft", "moveRight", "heal", "bite"] #all possible moves for zombies and people
-
-    def __init__(self, dimensions, pr):  
+    def __init__(
+        self,
+        dimensions: Tuple[int, int],
+        border: int,
+        cell_dimensions: Tuple[int, int],
+        player_role: str,
+    ):
         self.rows = dimensions[0]
         self.columns = dimensions[1]
-        self.Player_Role = pr 
-        for s in range(dimensions[0] * dimensions[1]):# creates a 1d array of the board
+        self.display_border = border
+        self.display_cell_dimensions = cell_dimensions
+        self.Player_Role = player_role # 1 if gov't, -1 if zombies
+        self.population = 0 # total number of people and zombies
+        self.States = []
+        self.QTable = []
+        for s in range(dimensions[0] * dimensions[1]): # creates a 1d array of the board
             self.States.append(State(None, s))
             self.QTable.append([0] * 6)
 
@@ -32,7 +35,7 @@ class Board:
             "bite": self.bite,
         }
 
-    def num_zombies(self): #number of zombies on the board, different than population
+    def num_zombies(self) -> int: #number of zombies on the board, different than population
         r = 0
         for state in self.States:
             if state.person != None:
@@ -40,7 +43,7 @@ class Board:
                     r += 1
         return r
 
-    def act(self, oldstate, givenAction): # takes in the cell and action and performs that using the actiontofunction
+    def act(self, oldstate: Tuple[int, int], givenAction: str): # takes in the cell and action and performs that using the actiontofunction
         cell = self.toCoord(oldstate)
         f = self.actionToFunction[givenAction](cell)
         reward = self.States[oldstate].evaluate(givenAction, self)
@@ -48,13 +51,13 @@ class Board:
             reward = 0
         return [reward, f[1]]
 
-    def containsPerson(self, isZombie): #checks if person is a person
+    def containsPerson(self, isZombie: bool): #checks if person is a person
         for state in self.States:
             if state.person is not None and state.person.isZombie == isZombie:
                 return True
         return False
 
-    def get_possible_moves(self, action, role):
+    def get_possible_moves(self, action: str, role: str):
         """
         Get the coordinates of people (or zombies) that are able
         to make the specified move.
@@ -63,7 +66,7 @@ class Board:
         is valid and which people/zombies it applies to
         """
         poss = []
-        B = self.clone(self.States, self.Player_Role)
+        B = self.clone(self.States, role)
 
         if role == "Zombie":
             if not self.containsPerson(True):
@@ -72,6 +75,7 @@ class Board:
                 state = self.States[idx]
                 if state.person is not None: # checks if a box is empty
                     changed_states = False
+
                     if (
                         action == "bite"
                         and not state.person.isZombie
@@ -81,7 +85,8 @@ class Board:
                         poss.append(B.toCoord(state.location))
                         changed_states = True
                     elif ( # otherwise move
-                        state.person.isZombie
+                        action != "bite"
+                        and state.person.isZombie
                         and B.actionToFunction[action](B.toCoord(state.location))[0]
                     ):
                         poss.append(B.toCoord(state.location))
@@ -107,13 +112,14 @@ class Board:
                         and state.person.isZombie
                         or not state.person.isVaccinated
                         or not state.person.wasCured
-                    ):
+                    ): #otherwise move
                         poss.append(B.toCoord(state.location))
                         changed_states = True
-                    elif ( # otherwise move
-                        not state.person.isZombie
+                    elif ( 
+                        action != "heal"
+                        and not state.person.isZombie
                         and B.actionToFunction[action](B.toCoord(state.location))[0]
-                    ):
+                    ): # otherwise move
                         poss.append(B.toCoord(state.location))
                         changed_states = True
 
@@ -125,17 +131,15 @@ class Board:
                             else B.States[i]
                             for i in range(len(self.States))
                         ]
-
-        print("possible: ", poss)
         return poss
 
-    def toCoord(self, i): # converts coord from 1d to 2d
+    def toCoord(self, i: int): # converts coord from 1d to 2d
         return (int(i % self.columns), int(i / self.rows))
 
-    def toIndex(self, coordinates): # converts coord from 2d to 1d
+    def toIndex(self, coordinates: Tuple[int, int]): # converts coord from 2d to 1d
         return int(coordinates[1] * self.columns) + int(coordinates[0])
 
-    def isValidCoordinate(self, coordinates): #checks if the box is in the grid
+    def isValidCoordinate(self, coordinates: Tuple[int, int]): #checks if the box is in the grid
         return (
             coordinates[1] < self.rows
             and coordinates[1] >= 0
@@ -143,13 +147,19 @@ class Board:
             and coordinates[0] >= 0
         )
 
-    def clone(self, L: list, role): #creates a duplicate board
-        NB = Board((self.rows, self.columns), role)
+    def clone(self, L: List[State], role: str): #creates a duplicate board
+        NB = Board(
+            (self.rows, self.columns),
+            self.display_border,
+            self.display_cell_dimensions,
+            self.Player_Role,
+        )
         NB.States = [state.clone() for state in L]
         NB.Player_Role = role
         return NB
 
-    def isAdjacentTo(self, coord, is_zombie: bool) -> bool: # returns adjacent coordinates containing the same type (so person if person etc)
+    def isAdjacentTo(self, coord: Tuple[int, int], is_zombie: bool) -> bool: # returns adjacent coordinates containing the same type (so person if person etc)
+
         ret = False
         vals = [
             (coord[0], coord[1] + 1),
@@ -168,61 +178,62 @@ class Board:
 
         return ret
 
-    def move(self, from_coords, new_coords) -> Tuple[bool, int]: #returns (if the move could be done, destination coord)
+    def move(
+        self, from_coords: Tuple[int, int], new_coords: Tuple[int, int]
+    ) -> Tuple[bool, int]: 
+        """
+        Check if the move is valid.
+        If valid, then implement the move and return [True, destination_idx]
+        If invalid, then return [False, None]
+        If the space is currently occupied, then return [False, destination_idx]
+        """
+        # Get the start and destination index (1D)
         start_idx = self.toIndex(from_coords)
         destination_idx = self.toIndex(new_coords)
 
+        # Check if the new coordinates are valid
         if not self.isValidCoordinate(new_coords):
             return [False, destination_idx]
 
-        try:
-            # only allow a move if the space isn't already occupied
-            if self.States[destination_idx].person is None:
-                self.States[destination_idx].person = self.States[start_idx].person
-                self.States[start_idx].person = None
-                return [True, destination_idx]
-            return [False, destination_idx]
-        except:
-            return [False, destination_idx]
+        # Check if the destination is currently occupied
+        if self.States[destination_idx].person is None:
+            self.States[destination_idx].person = self.States[start_idx].person
+            self.States[start_idx].person = None
+            return [True, destination_idx]
+        return [False, destination_idx]
 
-    #following functions just clone the destination square and clear the starter square, returning if the move was successful and the destination
-
-    def moveUp(self, coords) -> Tuple[bool, int]:
+    def moveUp(self, coords: Tuple[int, int]) -> Tuple[bool, int]:
         new_coords = (coords[0], coords[1] - 1)
-        print(f"going from {coords} to new coords {new_coords}")
         return self.move(coords, new_coords)
 
-    def moveDown(self, coords) -> Tuple[bool, int]:
+    def moveDown(self, coords: Tuple[int, int]) -> Tuple[bool, int]:
         new_coords = (coords[0], coords[1] + 1)
-        print(f"going from {coords} to new coords {new_coords}")
         return self.move(coords, new_coords)
 
-    def moveLeft(self, coords) -> Tuple[bool, int]:
+    def moveLeft(self, coords: Tuple[int, int]) -> Tuple[bool, int]:
         new_coords = (coords[0] - 1, coords[1])
-        print(f"going from {coords} to new coords {new_coords}")
         return self.move(coords, new_coords)
 
-    def moveRight(self, coords) -> Tuple[bool, int]:
+    def moveRight(self, coords: Tuple[int, int]) -> Tuple[bool, int]:
         new_coords = (coords[0] + 1, coords[1])
-        print(f"going from {coords} to new coords {new_coords}")
         return self.move(coords, new_coords)
 
     # q learning functions
 
-    def QGreedyat(self, state_id): #evaluates the best move in the qtable, returning the index of the move in the table and the move
+    def QGreedyat(self, state_id: int): #evaluates the best move in the qtable, returning the index of the move in the table and the move
         biggest = self.QTable[state_id][0] * self.Player_Role
         ind = 0
         A = self.QTable[state_id]
         i = 0
         for qval in A:
-            if (qval * self.Player_Role) > self.biggest:
+            if (qval * self.Player_Role) > biggest:
                 biggest = qval
                 ind = i
             i += 1
         return [ind, self.QTable[ind]]  # action_index, qvalue
 
     # picks the action for the move in the qtable, including a probability that it is randomized based on the learning rate
-    def choose_action(self, state_id, lr):
+    def choose_action(self, state_id: int, lr: float): 
         L = lr * 100
         r = rd.randint(0, 100)
         if r < L:
@@ -237,7 +248,7 @@ class Board:
             return d
 
     # picks the person that it wants to move or use, also including a learning rate based probability, returning the index of the state
-    def choose_state(self, lr):
+    def choose_state(self, lr: float):
         L = lr * 100
         r = rd.randint(0, 100)
         if r < L:
@@ -267,10 +278,9 @@ class Board:
                     d = rd.randint(0, len(self.States))
             return d
 
+    # defining the actions of the zombies and people
 
-    # defining the actions of the persons
-
-    def bite(self, coords):
+    def bite(self, coords: Tuple[int, int]) -> Tuple[bool, int]:
         i = self.toIndex(coords)
         if self.States[i] is None:
             return False
@@ -289,10 +299,15 @@ class Board:
             self.States[i].person = newP
         return [True, i]
 
-    def heal(self, coords):
+    def heal(self, coords: Tuple[int, int]) -> Tuple[bool, int]:
+        """
+        Heals the person at the stated coordinates
+        If no person is selected, then return [False, None]
+        if a person is vaccined, then return [True, index]
+        """
         i = self.toIndex(coords)
         if self.States[i].person is None:
-            return False
+            return [False, None]
         p = self.States[i].person
         newP = p.clone()
         newP.isZombie = False
@@ -305,20 +320,20 @@ class Board:
         return [True, i]
 
     #gets all the locations of people or zombies on the board (this can be used to count them as well)
-    def get_possible_states(self, rn):
+    def get_possible_states(self, role_number: int):
         indexes = []
         i = 0
         for state in self.States:
             if state.person != None:
-                if rn == 1 and state.person.isZombie == False:
+                if role_number == 1 and state.person.isZombie == False:
                     indexes.append(i)
-                elif rn == -1 and state.person.isZombie:
+                elif role_number == -1 and state.person.isZombie:
                     indexes.append(i)
             i += 1
         return indexes
 
     # runs each choice for the qlearning algorithm
-    def step(self, role_number, learningRate):
+    def step(self, role_number: int, learningRate: float):
         P = self.get_possible_states(role_number) #gets all the relevent players
         r = rd.uniform(0, 1)
         if r < learningRate: # 50% chance of this happening
@@ -355,7 +370,6 @@ class Board:
                 poss.append(x)
             else:
                 self.States[x].person = None
-        print("people at ", poss)
         used = []
         for x in range(4):                     # adds four zombies every time, so worst case there will be 3 ppl and 4 zombies
             s = rd.randint(0, len(poss) - 1)   # and the best case scenario is 8 ppl 4 zombies
