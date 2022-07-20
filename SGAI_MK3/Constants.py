@@ -1,5 +1,11 @@
 import enum
 
+ROWS = 6
+COLUMNS = 6
+BORDER = 150  # Number of pixels to offset grid to the top-left side
+CELL_DIMENSIONS = (100, 100)  # Number of pixels (x,y) for each cell
+SELF_PLAY = True  # whether or not a human will be playing
+
 class Action(enum.Enum):
     move = 1
     bite = 2
