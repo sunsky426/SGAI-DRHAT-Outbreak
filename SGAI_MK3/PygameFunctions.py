@@ -222,7 +222,7 @@ def display_lose_screen():
                 return
 
 
-def direction(coord1: Tuple[int, int], coord2: Tuple[int, int]):
+def direction(coord1: Tuple[int, int], coord2: Tuple[int, int]):    
     if coord2[1] > coord1[1]:
         return "moveDown"
     elif coord2[1] < coord1[1]:
