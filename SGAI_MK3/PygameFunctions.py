@@ -30,12 +30,13 @@ screen.fill(BACKGROUND)
 def get_action(GameBoard: Board, pixel_x: int, pixel_y: int):
     """
     Get the action that the click represents.
-    If the click was on the heal button, returns Action.heal
+    If the click was on the heal or kill button, returns Action.heal or Action.kill respectively
     Else, returns the board coordinates of the click (board_x, board_y) if valid
     Return None otherwise
     """
     # Check if the user clicked on the "heal" icon, return "heal" if so
-    heal_check = pixel_x >= 900 and pixel_x <= 1100 and pixel_y > 199 and pixel_y < 301
+    heal_check = pixel_x >= 950 and pixel_x <= 1050 and pixel_y > 199 and pixel_y < 301
+    kill_check = pixel_x >= 800 and pixel_x <= 900 and pixel_y > 199 and pixel_y < 301
     reset_move_check = (
         pixel_x >= RESET_MOVE_COORDS[0]
         and pixel_x <= RESET_MOVE_COORDS[0] + RESET_MOVE_DIMS[0]
@@ -54,6 +55,8 @@ def get_action(GameBoard: Board, pixel_x: int, pixel_y: int):
 
     if heal_check:
         return Action.heal
+    elif kill_check:
+        return Action.kill
     elif reset_move_check:
         return "reset move"
     elif move_check:
@@ -71,6 +74,8 @@ def run(GameBoard: Board):
     display_image(
         screen, "Assets/cure.jpeg", GameBoard.display_cell_dimensions, (950, 200)
     )
+    #Draw the kill button slightly to the left of heal
+    display_image(screen, "Assets/kill.png", GameBoard.display_cell_dimensions, (800, 200))
     display_people(GameBoard)
     display_reset_move_button()
     return pygame.event.get()

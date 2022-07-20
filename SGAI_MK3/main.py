@@ -53,6 +53,9 @@ while running:
                     # only allow healing by itself (prevents things like ['move', (4, 1), 'heal'])
                     if len(take_action) == 0:
                         take_action.append(Action.heal)
+                elif action == Action.kill:
+                    #placeholder for now
+                    print("Zombie killed")
                 elif action == "reset move":
                     take_action = []
                 elif action is not None:
