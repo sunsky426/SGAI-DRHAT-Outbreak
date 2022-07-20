@@ -4,6 +4,7 @@ from Board import Board
 import PygameFunctions as PF
 import random as rd
 from Enums import *
+import time
 
 # Constants and stuff
 ROWS = 6
@@ -93,11 +94,16 @@ while running:
                     playerMoved = True
                 take_action = []
 
-        # Computer turn
         if playerMoved:
+            # Intermission
+            PF.run(GameBoard)
+            pygame.display.update()
+            time.sleep(0.1)
+            print("Enemy turn")
+
+            # Computer turn
             playerMoved = False
             take_action = []
-            print("Enemy turn")
 
             if player_role == Role.government:
                 possible_actions = [Action.move, Action.bite]
