@@ -41,14 +41,6 @@ class Board:
                     r += 1
         return r
 
-    def act(self, oldstate: Tuple[int, int], givenAction: str):
-        cell = self.toCoord(oldstate)
-        f = self.actionToFunction[givenAction](cell)
-        reward = self.States[oldstate].evaluate(givenAction, self)
-        if f[0] == False:
-            reward = 0
-        return [reward, f[1]]
-
     def containsPerson(self, isZombie: bool):
         for state in self.States:
             if state.person is not None and state.person.isZombie == isZombie:
@@ -137,25 +129,6 @@ class Board:
         NB.States = [state.clone() for state in L]
         NB.Player_Role = role
         return NB
-
-    def isAdjacentTo(self, coord: Tuple[int, int], is_zombie: bool) -> bool:
-        ret = False
-        vals = [
-            (coord[0], coord[1] + 1),
-            (coord[0], coord[1] - 1),
-            (coord[0] + 1, coord[1]),
-            (coord[0] - 1, coord[1]),
-        ]
-        for coord in vals:
-            if (
-                self.isValidCoordinate(coord)
-                and self.States[self.toIndex(coord)].person is not None
-                and self.States[self.toIndex(coord)].person.isZombie == is_zombie
-            ):
-                ret = True
-                break
-
-        return ret
 
     def getTargetCoords(self, coords: Tuple[int, int], direction: Direction) -> Tuple[int, int]:
         if direction == Direction.up:
@@ -274,7 +247,7 @@ class Board:
         chance = 100
         target = self.States[target_idx].person
         if target.isVaccinated:
-            chance = 0
+            chance = 20
         elif target.wasVaccinated != target.wasCured:
             chance = 75
         elif target.wasVaccinated and target.wasCured:
@@ -329,10 +302,7 @@ class Board:
             self.States[target_idx].person = newTarget
         else:
             #implement failed heal
-            newOrigin = self.States[start_idx].person.clone()
-            newOrigin.isZombie = True
-            newOrigin.isVaccinated = False
-            self.States[start_idx].person = newOrigin
+            self.bite(target_coords, reverse_dir[direction])
         return [True, target_idx]
 
     def get_possible_states(self, role_number: int):

@@ -1,3 +1,4 @@
+from audioop import reverse
 import enum
 
 class Action(enum.Enum):
@@ -15,3 +16,10 @@ class Direction(enum.Enum):
 class Role(enum.Enum):
     government = 0
     zombie = 1
+
+reverse_dir = {
+    Direction.up: Direction.down,
+    Direction.down: Direction.up,
+    Direction.left: Direction.right,
+    Direction.right: Direction.left
+}
