@@ -1,6 +1,6 @@
 from typing import Tuple
 import pygame
-
+from Constants import *
 from Board import Board
 
 # constants
@@ -30,13 +30,20 @@ screen.fill(BACKGROUND)
 def get_action(GameBoard: Board, pixel_x: int, pixel_y: int):
     """
     Get the action that the click represents.
-    If the click was on the heal button, returns "heal"
+    If the click was on the heal or kill button, returns Action.heal or Action.kill respectively
     Else, returns the board coordinates of the click (board_x, board_y) if valid
     Return None otherwise
     """
     # Check if the user clicked on the "heal" icon, return "heal" if so
-    heal_check = pixel_x >= 900 and pixel_x <= 1100 and pixel_y > 190 and pixel_y < 301
-    reset_move_check = checkButton(RESET_MOVE_COORDS, RESET_MOVE_DIMS, pixel_x, pixel_y)
+
+    heal_bite_check = pixel_x >= 900 and pixel_x <= 1100 and pixel_y > 190 and pixel_y < 301
+    kill_check = pixel_x >= 800 and pixel_x <= 900 and pixel_y > 199 and pixel_y < 301
+    reset_move_check = (
+        pixel_x >= RESET_MOVE_COORDS[0]
+        and pixel_x <= RESET_MOVE_COORDS[0] + RESET_MOVE_DIMS[0]
+        and pixel_y >= RESET_MOVE_COORDS[1]
+        and pixel_y <= RESET_MOVE_COORDS[1] + RESET_MOVE_DIMS[1]
+    )
     board_x = int((pixel_x - 150) / 100)
     board_y = int((pixel_y - 150) / 100)
     move_check = (
@@ -47,8 +54,13 @@ def get_action(GameBoard: Board, pixel_x: int, pixel_y: int):
     )
     board_coords = (int((pixel_x - 150) / 100), int((pixel_y - 150) / 100))
 
-    if heal_check:
-        return "heal"
+    if heal_bite_check:
+        if GameBoard.player_role == Role.government:
+            return Action.heal
+        else:
+            return Action.bite
+    elif kill_check:
+        return Action.kill
     elif reset_move_check:
         return "reset move"
     elif move_check:
@@ -63,9 +75,12 @@ def run(GameBoard: Board):
     screen.fill(BACKGROUND)
     build_grid(GameBoard)  # Draw the grid
     # Draw the heal icon
-    display_image(
-        screen, "Assets/cure.jpeg", GameBoard.display_cell_dimensions, (950, 200)
-    )
+    if GameBoard.player_role == Role.government:
+        display_image(screen, "Assets/cure.jpeg", GameBoard.display_cell_dimensions, (950, 200))
+        display_image(screen, "Assets/kill.png", GameBoard.display_cell_dimensions, (800, 200))
+    else:
+        display_image(screen, "Assets/bite.png", GameBoard.display_cell_dimensions, (950, 200))
+    #Draw the kill button slightly to the left of heal
     display_people(GameBoard)
     display_reset_move_button()
     return pygame.event.get()
@@ -223,13 +238,10 @@ def display_lose_screen():
 
 def direction(coord1: Tuple[int, int], coord2: Tuple[int, int]):    
     if coord2[1] > coord1[1]:
-        return "moveDown"
+        return Direction.down
     elif coord2[1] < coord1[1]:
-        return "moveUp"
+        return Direction.up
     elif coord2[0] > coord1[0]:
-        return "moveRight"
+        return Direction.right
     elif coord2[0] < coord1[0]:
-        return "moveLeft"
-
-def checkButton(coords, dims, mouseX, mouseY): #checks if the cooords (mouseX, mouseY) are within the box made by the rectangle of coords and dims
-    return mouseX >= coords[0] and mouseX <= coords[0] + dims[0] and mouseY >= coords[1] and mouseY <= coords[1] + dims[1]
+        return Direction.left
