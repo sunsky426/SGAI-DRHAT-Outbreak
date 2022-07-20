@@ -7,7 +7,7 @@ from Constants import *
 import time
 
 # Player role variables
-player_role = Role.zombie  # Valid options are Role.government and Role.zombie
+player_role = Role.government  # Valid options are Role.government and Role.zombie
 roleToRoleNum = {Role.government: 1, Role.zombie: -1}
 
 # Create the game board
@@ -107,7 +107,7 @@ while running:
                 possible_actions = [Action.move, Action.bite]
                 computer_role = Role.zombie
             else:
-                possible_actions = [Action.move, Action.heal] #Action.kill
+                possible_actions = [Action.move, Action.heal, Action.kill]
                 computer_role = Role.government
 
             possible_move_coords = []
