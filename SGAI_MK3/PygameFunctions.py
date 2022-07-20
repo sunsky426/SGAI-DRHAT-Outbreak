@@ -27,7 +27,7 @@ pygame.display.set_caption("Outbreak!")
 screen.fill(BACKGROUND)
 
 
-def get_action(GameBoard: Board, pixel_x: int, pixel_y: int):
+def get_action(GameBoard: Board, pixel_x: int, pixel_y: int, player_role: Role):
     """
     Get the action that the click represents.
     If the click was on the heal or kill button, returns Action.heal or Action.kill respectively
@@ -35,7 +35,7 @@ def get_action(GameBoard: Board, pixel_x: int, pixel_y: int):
     Return None otherwise
     """
     # Check if the user clicked on the "heal" icon, return "heal" if so
-    heal_check = pixel_x >= 950 and pixel_x <= 1050 and pixel_y > 199 and pixel_y < 301
+    heal_bite_check = pixel_x >= 900 and pixel_x <= 1100 and pixel_y > 190 and pixel_y < 301
     kill_check = pixel_x >= 800 and pixel_x <= 900 and pixel_y > 199 and pixel_y < 301
     reset_move_check = (
         pixel_x >= RESET_MOVE_COORDS[0]
@@ -53,8 +53,11 @@ def get_action(GameBoard: Board, pixel_x: int, pixel_y: int):
     )
     board_coords = (int((pixel_x - 150) / 100), int((pixel_y - 150) / 100))
 
-    if heal_check:
-        return Action.heal
+    if heal_bite_check:
+        if player_role == Role.government:
+            return Action.heal
+        else:
+            return Action.bite
     elif kill_check:
         return Action.kill
     elif reset_move_check:
