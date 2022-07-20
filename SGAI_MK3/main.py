@@ -18,7 +18,7 @@ player_role = Role.government  # Valid options are Role.government and Role.zomb
 roleToRoleNum = {Role.government: 1, Role.zombie: -1}
 
 # Create the game board
-GameBoard = Board((ROWS, COLUMNS), BORDER, CELL_DIMENSIONS, roleToRoleNum[player_role])
+GameBoard = Board((ROWS, COLUMNS), BORDER, CELL_DIMENSIONS, player_role)
 GameBoard.populate()
 
 # Self play variables
@@ -27,7 +27,7 @@ gamma = 0.6
 epsilon = 0.1
 epochs = 1000
 epochs_ran = 0
-Original_Board = GameBoard.clone(GameBoard.States, GameBoard.Player_Role)
+Original_Board = GameBoard.clone(GameBoard.States, GameBoard.player_role)
 
 
 # Initialize variables

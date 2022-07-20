@@ -27,7 +27,7 @@ pygame.display.set_caption("Outbreak!")
 screen.fill(BACKGROUND)
 
 
-def get_action(GameBoard: Board, pixel_x: int, pixel_y: int, player_role: Role):
+def get_action(GameBoard: Board, pixel_x: int, pixel_y: int):
     """
     Get the action that the click represents.
     If the click was on the heal or kill button, returns Action.heal or Action.kill respectively
@@ -54,7 +54,7 @@ def get_action(GameBoard: Board, pixel_x: int, pixel_y: int, player_role: Role):
     board_coords = (int((pixel_x - 150) / 100), int((pixel_y - 150) / 100))
 
     if heal_bite_check:
-        if player_role == Role.government:
+        if GameBoard.player_role == Role.government:
             return Action.heal
         else:
             return Action.bite
@@ -74,9 +74,10 @@ def run(GameBoard: Board):
     screen.fill(BACKGROUND)
     build_grid(GameBoard)  # Draw the grid
     # Draw the heal icon
-    display_image(
-        screen, "Assets/cure.jpeg", GameBoard.display_cell_dimensions, (950, 200)
-    )
+    if GameBoard.player_role == Role.government:
+        display_image(screen, "Assets/cure.jpeg", GameBoard.display_cell_dimensions, (800, 200))
+    else:
+        display_image(screen, "Assets/bite.jpeg", GameBoard.display_cell_dimensions, (800, 200))
     #Draw the kill button slightly to the left of heal
     display_image(screen, "Assets/kill.png", GameBoard.display_cell_dimensions, (800, 200))
     display_people(GameBoard)
