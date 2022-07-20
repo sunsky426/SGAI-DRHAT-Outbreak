@@ -176,9 +176,7 @@ class Board:
 
         return ret
 
-    def move(self, coords: Tuple[int, int], direction: Direction) -> Tuple[bool, int]:
-        start_idx = self.toIndex(coords)
-        
+    def findNewCoords(self, coords: Tuple[int, int], direction: Direction) -> Tuple[int, int]:
         if direction == Direction.up:
             new_coords = (coords[0], coords[1] - 1)
             print(f"going from {coords} to new coords {new_coords}")
@@ -191,6 +189,13 @@ class Board:
         elif direction == Direction.right:
             new_coords = (coords[0] + 1, coords[1])
             print(f"going from {coords} to new coords {new_coords}")
+        
+        return new_coords
+    
+    def move(self, coords: Tuple[int, int], direction: Direction) -> Tuple[bool, int]:
+        start_idx = self.toIndex(coords)
+        
+        new_coords = self.findNewCoords(coords, direction)
         
         # Get the start and destination index (1D)
         start_idx = self.toIndex(coords)
