@@ -10,8 +10,6 @@ ROWS = 6
 COLUMNS = 6
 BORDER = 150  # Number of pixels to offset grid to the top-left side
 CELL_DIMENSIONS = (100, 100)  # Number of pixels (x,y) for each cell
-ACTION_SPACE = (Action.move, Action.bite, Action.heal, Action.kill)
-DIRECTION_SPACE = (Direction.up, Direction.down, Direction.left, Direction.right)
 SELF_PLAY = True  # whether or not a human will be playing
 
 # Player role variables
