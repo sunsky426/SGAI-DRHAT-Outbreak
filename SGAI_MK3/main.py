@@ -5,7 +5,7 @@ import PygameFunctions as PF
 import random as rd
 from Enums import *
 
-# Constants
+# Constants and stuff
 ROWS = 6
 COLUMNS = 6
 BORDER = 150  # Number of pixels to offset grid to the top-left side
