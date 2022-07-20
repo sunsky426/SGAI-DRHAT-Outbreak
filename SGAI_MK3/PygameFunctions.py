@@ -1,6 +1,6 @@
 from typing import Tuple
 import pygame
-from Enums import *
+from Constants import *
 from Board import Board
 
 # constants
@@ -76,10 +76,10 @@ def run(GameBoard: Board):
     # Draw the heal icon
     if GameBoard.player_role == Role.government:
         display_image(screen, "Assets/cure.jpeg", GameBoard.display_cell_dimensions, (950, 200))
+        display_image(screen, "Assets/kill.png", GameBoard.display_cell_dimensions, (800, 200))
     else:
         display_image(screen, "Assets/bite.jpeg", GameBoard.display_cell_dimensions, (950, 200))
     #Draw the kill button slightly to the left of heal
-    display_image(screen, "Assets/kill.png", GameBoard.display_cell_dimensions, (800, 200))
     display_people(GameBoard)
     display_reset_move_button()
     return pygame.event.get()

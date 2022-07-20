@@ -4,7 +4,7 @@ from State import State
 import random as rd
 from Person import Person
 from typing import List, Tuple
-from Enums import *
+from Constants import *
 
 
 class Board:
