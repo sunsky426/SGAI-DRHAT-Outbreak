@@ -1,7 +1,6 @@
 from typing import Tuple
 import pygame
-from Enums import Direction
-
+from Enums import *
 from Board import Board
 
 # constants
@@ -31,7 +30,7 @@ screen.fill(BACKGROUND)
 def get_action(GameBoard: Board, pixel_x: int, pixel_y: int):
     """
     Get the action that the click represents.
-    If the click was on the heal button, returns "heal"
+    If the click was on the heal button, returns Action.heal
     Else, returns the board coordinates of the click (board_x, board_y) if valid
     Return None otherwise
     """
@@ -54,7 +53,7 @@ def get_action(GameBoard: Board, pixel_x: int, pixel_y: int):
     board_coords = (int((pixel_x - 150) / 100), int((pixel_y - 150) / 100))
 
     if heal_check:
-        return "heal"
+        return Action.heal
     elif reset_move_check:
         return "reset move"
     elif move_check:

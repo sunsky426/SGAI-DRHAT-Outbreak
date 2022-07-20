@@ -11,3 +11,7 @@ class Direction(enum.Enum):
     down = 2
     left = 3
     right = 4
+
+class Role(enum.Enum):
+    government = 0
+    zombie = 1
