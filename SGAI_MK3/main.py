@@ -7,7 +7,7 @@ from Constants import *
 import time
 
 # Player role variables
-player_role = Role.government  # Valid options are Role.government and Role.zombie
+player_role = Role.zombie  # Valid options are Role.government and Role.zombie
 roleToRoleNum = {Role.government: 1, Role.zombie: -1}
 
 # Create the game board
