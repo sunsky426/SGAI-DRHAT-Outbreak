@@ -14,7 +14,7 @@ class State:
         second_coord = self.toCoord(other_id)
         return (float)((second_coord[1] - first_coord[1])**2 + (second_coord[0] - first_coord[0])**2)**0.5
 
-    def nearest_zombie(self, B):  #pretty self explanatory
+    def nearest_zombie(self, GameBoard):  #pretty self explanatory
         smallest_dist = 100
         for state in GameBoard.States:
             if state.person != None:
@@ -38,8 +38,8 @@ class State:
             reward = reward + int(5 * (2 + chance))
         return reward
 
-    def adjacent(self, Board):  # returns the four adjacent boxes that are in bounds
-        newCoord = Board.toCoord(self.location)
+    def adjacent(self, GameBoard):  # returns the four adjacent boxes that are in bounds
+        newCoord = GameBoard.toCoord(self.location)
         print(newCoord)
         moves = [              #puts all four adjacent locations into moves
             (newCoord[0], newCoord[1] - 1),
