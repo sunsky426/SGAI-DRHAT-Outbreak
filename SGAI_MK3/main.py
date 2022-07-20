@@ -33,7 +33,7 @@ font = pygame.font.SysFont("Comic Sans", 20)
 while running:
     P = PF.run(GameBoard)
     if SELF_PLAY:
-        if not GameBoard.containsPerson(False):
+        if not GameBoard.containsPerson(bool(player_role.value)):
             PF.display_lose_screen()
             running = False
             continue

@@ -176,6 +176,7 @@ class Board:
     
     def move(self, coords: Tuple[int, int], direction: Direction) -> Tuple[bool, int]:    
         new_coords = self.getTargetCoords(coords, direction)
+        if not self.isValidCoordinate(new_coords): return (False, new_coords)
         
         # Get the start and destination index (1D)
         start_idx = self.toIndex(coords)
@@ -251,6 +252,7 @@ class Board:
 
     def bite(self, coords: Tuple[int, int], direction: Direction) -> Tuple[bool, int]:
         target_coords = self.getTargetCoords(coords, direction)
+        if not self.isValidCoordinate(target_coords): return (False, target_coords)
         
         # Get the start and destination index (1D)
         start_idx = self.toIndex(coords)
@@ -297,6 +299,7 @@ class Board:
         if a person is vaccined, then return [True, index]
         """
         target_coords = self.getTargetCoords(coords, direction)
+        if not self.isValidCoordinate(target_coords): return (False, target_coords)
         
         # Get the start and destination index (1D)
         start_idx = self.toIndex(coords)

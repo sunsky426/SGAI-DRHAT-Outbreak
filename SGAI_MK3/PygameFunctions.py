@@ -78,7 +78,7 @@ def run(GameBoard: Board):
         display_image(screen, "Assets/cure.jpeg", GameBoard.display_cell_dimensions, (950, 200))
         display_image(screen, "Assets/kill.png", GameBoard.display_cell_dimensions, (800, 200))
     else:
-        display_image(screen, "Assets/bite.jpeg", GameBoard.display_cell_dimensions, (950, 200))
+        display_image(screen, "Assets/bite.png", GameBoard.display_cell_dimensions, (950, 200))
     #Draw the kill button slightly to the left of heal
     display_people(GameBoard)
     display_reset_move_button()
