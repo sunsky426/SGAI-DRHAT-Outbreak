@@ -262,6 +262,32 @@ class Board:
             self.States[target_idx].person = newTarget
         return [True, target_idx]
 
+    def kill(self, coords: Tuple[int, int], direction: Direction) -> Tuple[bool, int]:
+        target_coords = self.getTargetCoords(coords, direction)
+        
+        # Get the start and destination index (1D)
+        start_idx = self.toIndex(coords)
+        target_idx = self.toIndex(target_coords)
+
+        #check if the orgin is valid
+        if (
+            self.States[start_idx].person is None
+            or self.States[start_idx].person.isZombie
+        ):
+            return[False, target_idx]
+        
+        
+        # Check if the destination is valid
+        if (
+            self.States[target_idx].person is None
+            or not self.States[target_idx].person.isZombie
+        ):
+            return [False, target_idx]
+
+        # Execute Kill
+        self.States[target_idx].person = None
+        return [True, target_idx]
+
     def heal(self, coords: Tuple[int, int], direction: Direction) -> Tuple[bool, int]:
         """
         the person at the stated coordinate heals the zombie to the person's stated direction
