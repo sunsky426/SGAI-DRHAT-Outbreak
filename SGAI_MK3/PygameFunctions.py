@@ -35,6 +35,7 @@ def get_action(GameBoard: Board, pixel_x: int, pixel_y: int):
     Return None otherwise
     """
     # Check if the user clicked on the "heal" icon, return "heal" if so
+
     heal_bite_check = pixel_x >= 900 and pixel_x <= 1100 and pixel_y > 190 and pixel_y < 301
     kill_check = pixel_x >= 800 and pixel_x <= 900 and pixel_y > 199 and pixel_y < 301
     reset_move_check = (
@@ -235,8 +236,7 @@ def display_lose_screen():
             if event.type == pygame.QUIT:
                 return
 
-
-def direction(coord1: Tuple[int, int], coord2: Tuple[int, int]):
+def direction(coord1: Tuple[int, int], coord2: Tuple[int, int]):    
     if coord2[1] > coord1[1]:
         return Direction.down
     elif coord2[1] < coord1[1]:
