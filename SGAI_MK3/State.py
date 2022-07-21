@@ -4,22 +4,17 @@ import math
 
 
 class State:
-    def __init__(self, p: Person, i, safeSpace = False) -> None:
+    def __init__(self, p: Person, i) -> None:
         self.person = p
         self.location = i
-        self.safeSpace = safeSpace
         pass
 
-    def distance(self, GameBoard, other_location: int):
-        first_coord = GameBoard.toCoord(self.location)
-        second_coord = GameBoard.toCoord(other_location)
-        a = second_coord[0] - first_coord[0]
-        b = second_coord[1] - first_coord[1]
-        a = a * a
-        b = b * a
-        return math.pow(int(a + b), 0.5)
+    def distance(self, other_id): # gets the distance between two states
+        first_coord = self.toCoord(self.location)
+        second_coord = self.toCoord(other_id)
+        return (float)((second_coord[1] - first_coord[1])**2 + (second_coord[0] - first_coord[0])**2)**0.5
 
-    def nearest_zombie(self, B):  #pretty self explanatory
+    def nearest_zombie(self, GameBoard):  #pretty self explanatory
         smallest_dist = 100
         for state in GameBoard.States:
             if state.person != None:
@@ -29,7 +24,7 @@ class State:
                         smallest_dist = d
         return smallest_dist
 
-    def evaluate(self, action: str, GameBoard):
+    def evaluate(self, action: str, GameBoard): # decides on the reward for a specific action based on what the board is like (for q learning)
         reward = 0
         reward += self.nearest_zombie(GameBoard) - 3
         if action == "heal":
@@ -43,8 +38,8 @@ class State:
             reward = reward + int(5 * (2 + chance))
         return reward
 
-    def adjacent(self, Board):  # returns the four adjacent boxes that are in bounds
-        newCoord = Board.toCoord(self.location)
+    def adjacent(self, GameBoard):  # returns the four adjacent boxes that are in bounds
+        newCoord = GameBoard.toCoord(self.location)
         print(newCoord)
         moves = [              #puts all four adjacent locations into moves
             (newCoord[0], newCoord[1] - 1),
@@ -52,10 +47,10 @@ class State:
             (newCoord[0] - 1, newCoord[1]),
             (newCoord[0] + 1, newCoord[1]),
         ]
-        remove = []
+        remove = []  #creates the ones to remove
         for i in range(4):
             move = moves[i]
-            if (
+            if (        #removes all illigal options
                 move[0] < 0
                 or move[0] > GameBoard.columns
                 or move[1] < 0
@@ -67,23 +62,15 @@ class State:
             moves.pop(r)
         return moves
 
-    def clone(self):
+    def clone(self): #clones the state (for the purpose of moving people and zombies)
         if self.person is None:
             return State(self.person, self.location)
         return State(self.person.clone(), self.location)
 
-    def __eq__(self, __o: object) -> bool:
+    def __eq__(self, __o: object) -> bool: # compares if two states are the same, not just the same person but also the same location
         if type(__o) == State:
             return self.person == __o.person and self.location == __o.location
         return False
 
-    def __ne__(self, __o: object) -> bool:
+    def __ne__(self, __o: object) -> bool: # same as over but not equals
         return not self == __o
-
-    def update(self):
-        """
-        If this has a person, update the person within.
-        """
-        if self.person is None:
-            return
-        self.person.update()

@@ -1,8 +1,8 @@
-# SGAI - Outbreak
+# SGAI - DRHAT - Outbreak
 This is the repository that Beaverworks' SGAI 2022 will be using to understand
 serious games and reinforcement learning.
 
-## Team Courtney II
+## Team Courtney I
 The best team out there.
 
 ## How to run
