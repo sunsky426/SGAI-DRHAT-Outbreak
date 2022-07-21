@@ -333,35 +333,6 @@ class Board:
         # QTable[state][acti] = new_value
 
     def populate(self):
-<<<<<<< Updated upstream
-        total = rd.randint(7, ((self.rows * self.columns) / 3))
-        poss = []
-        for x in range(len(self.States)):
-            r = rd.randint(0, 100)
-            if r < 60 and self.population < total:
-                p = Person(False)
-                self.States[x].person = p
-                self.population = self.population + 1
-                poss.append(x)
-            else:
-                self.States[x].person = None
-        used = []
-        for x in range(4):
-            s = rd.randint(0, len(poss) - 1)
-            while s in used:
-                s = rd.randint(0, len(poss) - 1)
-            self.States[poss[s]].person.isZombie = True
-            used.append(s)
-
-    def update(self):
-        """
-        Update each of the states;
-        This method should be called at the end of each round
-        (after player and computer have each gone once)
-        """
-        for state in self.States:
-            state.update()
-=======
 
         #make between 7 and boardsize/3 people
         allppl = rd.sample(range(len(self.States)), rd.randint(7, ((self.rows * self.columns) / 3)))
@@ -370,8 +341,7 @@ class Board:
             if state in allppl:
                 self.States[state].person = Person(False)
                 self.population += 1
-        print(allppl)
-
+                
         #turn half the humans into zombies
         allzombs = rd.sample(range(len(allppl)), len(allppl)//2)
         for person in range(len(allppl)):
@@ -383,4 +353,3 @@ class Board:
         for space in range(len(self.States)):
             if state in allppl:
                 self.States[state].safeSpace = True
->>>>>>> Stashed changes
