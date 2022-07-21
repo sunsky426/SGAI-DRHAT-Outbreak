@@ -1,28 +1,30 @@
-# Constants
+import enum
+
 ROWS = 6
 COLUMNS = 6
-ACTION_SPACE = ["moveUp", "moveDown", "moveLeft", "moveRight", "heal", "bite"]
+BORDER = 150  # Number of pixels to offset grid to the top-left side
+CELL_DIMENSIONS = (100, 100)  # Number of pixels (x,y) for each cell
+SELF_PLAY = True  # whether or not a human will be playing
 
-# Player role variables
-ROLE_TO_ROLE_NUM = {"Government": 1, "Zombie": -1}
-ROLE_TO_ROLE_BOOLEAN = {"Government": False, "Zombie": True}
+class Action(enum.Enum):
+    move = 1
+    bite = 2
+    heal = 3
+    kill = 4
 
-# Pygame constants
-BACKGROUND = "#DDC2A1"
-BLACK = (0, 0, 0)
-WHITE = (255, 255, 255)
-CELL_COLOR = (233, 222, 188)
-LINE_WIDTH = 5
-IMAGE_ASSETS = [
-    "person_normal.png",
-    "person_vax.png",
-    "person_zombie.png",
-]
-GAME_WINDOW_DIMENSIONS = (1200, 800)
-RESET_MOVE_COORDS = (800, 600)
-RESET_MOVE_DIMS = (200, 50)
-CURE_BITE_COORDS = (950, 200)
-CURE_BITE_DIMS = (200, 200)
-CELL_DIMENSIONS = (100, 100)  # number of pixels (x, y) for each cell
-CUR_MOVE_COORDS = (800, 400)
-MARGIN = 150  # Number of pixels to offset grid to the top-left side
+class Direction(enum.Enum):
+    up = 1
+    down = 2
+    left = 3
+    right = 4
+
+class Role(enum.Enum):
+    government = 0
+    zombie = 1
+
+reverse_dir = {
+    Direction.up: Direction.down,
+    Direction.down: Direction.up,
+    Direction.left: Direction.right,
+    Direction.right: Direction.left
+}
