@@ -333,6 +333,7 @@ class Board:
         # QTable[state][acti] = new_value
 
     def populate(self):
+<<<<<<< Updated upstream
         total = rd.randint(7, ((self.rows * self.columns) / 3))
         poss = []
         for x in range(len(self.States)):
@@ -360,3 +361,26 @@ class Board:
         """
         for state in self.States:
             state.update()
+=======
+
+        #make between 7 and boardsize/3 people
+        allppl = rd.sample(range(len(self.States)), rd.randint(7, ((self.rows * self.columns) / 3)))
+        for state in range(len(self.States)):
+            self.States[state].person = None
+            if state in allppl:
+                self.States[state].person = Person(False)
+                self.population += 1
+        print(allppl)
+
+        #turn half the humans into zombies
+        allzombs = rd.sample(range(len(allppl)), len(allppl)//2)
+        for person in range(len(allppl)):
+            if person in allzombs:
+                self.States[allppl[person]].person.isZombie = True
+
+        #add two safe spaces
+        allsafes = rd.sample(range(len(self.States)), rd.randint(1, (self.rows*self.columns)//15))
+        for space in range(len(self.States)):
+            if state in allppl:
+                self.States[state].safeSpace = True
+>>>>>>> Stashed changes

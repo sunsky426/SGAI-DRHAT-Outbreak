@@ -4,7 +4,7 @@ import math
 
 
 class State:
-    def __init__(self, p: Person, i) -> None:
+    def __init__(self, p: Person, i, safeSpace = False) -> None:
         self.person = p
         self.location = i
         pass
@@ -18,7 +18,11 @@ class State:
         b = b * a
         return math.pow(int(a + b), 0.5)
 
+<<<<<<< Updated upstream
     def nearest_zombie(self, GameBoard):
+=======
+    def nearest_zombie(self, B):  #pretty self explanatory
+>>>>>>> Stashed changes
         smallest_dist = 100
         for state in GameBoard.States:
             if state.person != None:
@@ -42,9 +46,16 @@ class State:
             reward = reward + int(5 * (2 + chance))
         return reward
 
+<<<<<<< Updated upstream
     def adjacent(self, GameBoard):
         newCoord = GameBoard.toCoord(self.location)
         moves = [
+=======
+    def adjacent(self, Board):  # returns the four adjacent boxes that are in bounds
+        newCoord = Board.toCoord(self.location)
+        print(newCoord)
+        moves = [              #puts all four adjacent locations into moves
+>>>>>>> Stashed changes
             (newCoord[0], newCoord[1] - 1),
             (newCoord[0], newCoord[1] + 1),
             (newCoord[0] - 1, newCoord[1]),
