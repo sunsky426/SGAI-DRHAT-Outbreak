@@ -4,9 +4,10 @@ import math
 
 
 class State:
-    def __init__(self, p: Person, i) -> None:
+    def __init__(self, p: Person, i, safeSpace = False) -> None:
         self.person = p
         self.location = i
+        self.safeSpace = safeSpace
         pass
 
     def distance(self, other_id): # gets the distance between two states
