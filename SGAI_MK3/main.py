@@ -53,7 +53,7 @@ while running:
                 elif action == "reset move":
                     take_action = []
                     
-                elif action is not None:
+                elif type(action) is tuple:
                     idx = GameBoard.toIndex(action)
                     # action is a coordinate
                     if idx < (GameBoard.rows * GameBoard.columns) and idx > -1:

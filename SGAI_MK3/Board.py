@@ -284,7 +284,7 @@ class Board:
         chance = 100
         target = self.States[target_idx].person
         if target.isVaccinated:
-            chance = 0
+            chance = 15
         elif target.wasVaccinated != target.wasCured:
             chance = 75
         elif target.wasVaccinated and target.wasCured:
@@ -340,10 +340,7 @@ class Board:
             self.States[target_idx].person = newTarget
         else:
             #implement failed heal
-            newOrigin = self.States[start_idx].person.clone()
-            newOrigin.isZombie = True
-            newOrigin.isVaccinated = False
-            self.States[start_idx].person = newOrigin
+            self.bite(target_coords, reverse_dir[direction])
         return [True, target_idx]
 
     def kill(self, coords: Tuple[int, int], direction: Direction) -> Tuple[bool, int]:
