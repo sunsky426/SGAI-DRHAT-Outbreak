@@ -18,13 +18,11 @@ There are basic moves:
 - Move - click on a person that you control and a square next to them.
 If the square isn't occupied, the person will move to that square.
 - Bite - If you are playing as a zombie,
-you can click the bite button and then a person next to a zombie
-to turn the person into a zombie. NOTE: THIS DOES NOT ALWAYS SUCCEED
-BECAUSE GAME MECHANICS MAKE IT SO THAT THERE IS A CHANCE THAT BITING WILL
-FAIL. THIS IS NOT A BUG. THIS IS A GAME MECHANIC.
+you can click the bite button and a zombie and then a person.
+to turn the person into a zombie. 
 - Heal - If you are playing as the government, you 
-can click the cure button and a person or zombie.
-If you clicked a zombie, the zombie will become a person again 
-(this is curing). If you clicked a person, the person will become
-vaccinated (this is vaccination). Vaccination lasts for 5 turns and
+can click the cure button and a person (the healer) and then a zombie (the healee).
+There is 50% chance that the zombie will be healed and become a person again 
+(this is curing).
 gives 100% immunity to being zombified.
+-Kill - 
