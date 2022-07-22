@@ -365,7 +365,7 @@ class Board:
         ):
             return [False, target_idx]
 
-        # Execute Bite
+        # Execute Kill
         self.States[target_idx].person = None
         return [True, target_idx]
 
