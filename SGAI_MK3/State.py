@@ -1,7 +1,4 @@
-from typing import Tuple
 from Person import Person
-import math
-
 
 class State:
     def __init__(self, p: Person, i, safeSpace = False) -> None:
