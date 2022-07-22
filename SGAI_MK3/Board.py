@@ -409,21 +409,23 @@ class Board:
 
     #adds the people into the grid
     def populate(self):
-        total = rd.randint(7, ((self.rows * self.columns) / 3)) # adds between 7 and squares/3 (12 rn) people
-        poss = []
-        for x in range(len(self.States)): # 60% chance that there will be a person in a square, which stupidly weighs them towards the top
-            r = rd.randint(0, 100)
-            if r < 60 and self.population < total: 
-                p = Person(False)
-                self.States[x].person = p
-                self.population = self.population + 1
-                poss.append(x)
-            else:
-                self.States[x].person = None
-        used = []
-        for x in range(4):                     # adds four zombies every time, so worst case there will be 3 ppl and 4 zombies
-            s = rd.randint(0, len(poss) - 1)   # and the best case scenario is 8 ppl 4 zombies
-            while s in used:
-                s = rd.randint(0, len(poss) - 1)
-            self.States[poss[s]].person.isZombie = True
-            used.append(s)
+
+        #make between 7 and boardsize/3 people
+        allppl = rd.sample(range(len(self.States)), rd.randint(7, ((self.rows * self.columns) / 3)))
+        for state in range(len(self.States)):
+            self.States[state].person = None
+            if state in allppl:
+                self.States[state].person = Person(False)
+                self.population += 1
+                
+        #turn half the humans into zombies
+        allzombs = rd.sample(range(len(allppl)), len(allppl)//2)
+        for person in range(len(allppl)):
+            if person in allzombs:
+                self.States[allppl[person]].person.isZombie = True
+
+        #add two safe spaces
+        allsafes = rd.sample(range(len(self.States)), rd.randint(1, (self.rows*self.columns)//15))
+        for space in range(len(self.States)):
+            if state in allppl:
+                self.States[state].safeSpace = True
