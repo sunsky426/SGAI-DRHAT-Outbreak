@@ -3,11 +3,13 @@ import pygame
 from Constants import *
 from Board import Board
 
+
 # constants
 BACKGROUND = "#DDC2A1"
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 CELL_COLOR = (233, 222, 188)
+SAFE_COLOR = (93, 138, 168)
 LINE_WIDTH = 5
 IMAGE_ASSETS = [
     "person_normal.png",
@@ -74,6 +76,7 @@ def run(GameBoard: Board):
     """
     screen.fill(BACKGROUND)
     build_grid(GameBoard)  # Draw the grid
+    display_safe_space(GameBoard)
     # Draw the heal icon
     if GameBoard.player_role == Role.government:
         display_image(screen, "Assets/cure.jpeg", GameBoard.display_cell_dimensions, (950, 200))
@@ -84,6 +87,22 @@ def run(GameBoard: Board):
     display_people(GameBoard)
     display_reset_move_button()
     return pygame.event.get()
+
+def display_safe_space(GameBoard):
+    for state in GameBoard.States:
+        if state.safeSpace:
+            coords = (
+                int(GameBoard.toCoord(state.location)[0]) * GameBoard.display_cell_dimensions[0]
+                + GameBoard.display_border,
+                int(GameBoard.toCoord(state.location)[1]) * GameBoard.display_cell_dimensions[1]
+                + GameBoard.display_border,
+            )
+            #pygame.draw.rect(screen, SAFE_COLOR, pygame.Rect(
+            #    coords[0],
+            #    coords[0] + 100, 
+            #    coords[1],
+            #    coords[1] + 100))
+            display_image(screen, "Assets/kill.png", (100, 100), coords)
 
 
 def display_reset_move_button():

@@ -426,6 +426,6 @@ class Board:
 
         #add two safe spaces
         allsafes = rd.sample(range(len(self.States)), rd.randint(1, (self.rows*self.columns)//15))
-        for space in range(len(self.States)):
-            if state in allppl:
+        for state in range(len(self.States)):
+            if state in allsafes:
                 self.States[state].safeSpace = True
