@@ -76,7 +76,7 @@ def run(GameBoard: Board):
     """
     screen.fill(BACKGROUND)
     build_grid(GameBoard)  # Draw the grid
-    display_safe_space(GameBoard)
+    
     # Draw the heal icon
     if GameBoard.player_role == Role.government:
         display_image(screen, "Assets/cure.jpeg", GameBoard.display_cell_dimensions, (950, 200))
@@ -86,9 +86,13 @@ def run(GameBoard: Board):
     #Draw the kill button slightly to the left of heal
     display_people(GameBoard)
     display_reset_move_button()
+    
     return pygame.event.get()
 
 def display_safe_space(GameBoard):
+    """
+    Creates a blue rectangle at every safe space state
+    """
     for state in GameBoard.States:
         if state.safeSpace:
             coords = (
@@ -97,12 +101,8 @@ def display_safe_space(GameBoard):
                 int(GameBoard.toCoord(state.location)[1]) * GameBoard.display_cell_dimensions[1]
                 + GameBoard.display_border,
             )
-            #pygame.draw.rect(screen, SAFE_COLOR, pygame.Rect(
-            #    coords[0],
-            #    coords[0] + 100, 
-            #    coords[1],
-            #    coords[1] + 100))
-            display_image(screen, "Assets/kill.png", (100, 100), coords)
+            #draw a rectangle of dimensions 100x100 at the coordinates created above
+            pygame.draw.rect(screen, SAFE_COLOR, pygame.Rect(coords[0], coords[1], 100, 100))
 
 
 def display_reset_move_button():
@@ -134,6 +134,7 @@ def build_grid(GameBoard: Board):
     """
     Draw the grid on the screen.
     """
+
     grid_width = GameBoard.columns * GameBoard.display_cell_dimensions[0]
     grid_height = GameBoard.rows * GameBoard.display_cell_dimensions[1]
     # left
@@ -186,7 +187,8 @@ def build_grid(GameBoard: Board):
         CELL_COLOR,
         [GameBoard.display_border, GameBoard.display_border, grid_width, grid_height],
     )
-
+    #Draw the safe space so that it is under the lines
+    display_safe_space(GameBoard)
     # Draw the vertical lines
     i = GameBoard.display_border + GameBoard.display_cell_dimensions[0]
     while i < GameBoard.display_border + grid_width:
