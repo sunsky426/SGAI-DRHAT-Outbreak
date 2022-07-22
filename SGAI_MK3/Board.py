@@ -5,6 +5,9 @@ import random as rd
 from Person import Person
 from typing import List, Tuple
 from constants import *
+import pygame
+import os
+pygame.mixer.init()
 
 
 class Board:
@@ -367,6 +370,7 @@ class Board:
 
         # Execute Bite
         self.States[target_idx].person = None
+        KILL_SOUND.play()
         return [True, target_idx]
 
     #gets all the locations of people or zombies on the board (this can be used to count them as well)

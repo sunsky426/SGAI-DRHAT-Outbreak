@@ -1,4 +1,4 @@
-from msilib.schema import Class
+#from msilib.schema import Class
 import pygame
 from Board import Board
 import PygameFunctions as PF
@@ -9,6 +9,10 @@ import time
 # Player role variables
 player_role = Role.government  # Valid options are Role.government and Role.zombie
 roleToRoleNum = {Role.government: 1, Role.zombie: -1}
+
+#initialize sound effect
+
+
 
 # Create the game board
 GameBoard = Board((ROWS, COLUMNS), BORDER, CELL_DIMENSIONS, player_role)

@@ -3,6 +3,7 @@ import pygame
 from constants import *
 from Board import Board
 
+
 # constants
 BACKGROUND = "#DDC2A1"
 BLACK = (0, 0, 0)
