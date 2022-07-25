@@ -13,6 +13,7 @@ class Action(enum.Enum):
     kill = 4
 
 class Direction(enum.Enum):
+    self = 0
     up = 1
     down = 2
     left = 3
@@ -23,6 +24,7 @@ class Role(enum.Enum):
     zombie = 1
 
 reverse_dir = {
+    Direction.self: Direction.self,
     Direction.up: Direction.down,
     Direction.down: Direction.up,
     Direction.left: Direction.right,

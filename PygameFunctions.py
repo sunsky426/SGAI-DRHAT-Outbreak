@@ -11,11 +11,6 @@ WHITE = (255, 255, 255)
 CELL_COLOR = (233, 222, 188)
 SAFE_COLOR = (93, 138, 168)
 LINE_WIDTH = 5
-IMAGE_ASSETS = [
-    "person_normal.png",
-    "person_vax.png",
-    "person_zombie.png",
-]
 GAME_WINDOW_DIMENSIONS = (1200, 800)
 RESET_MOVE_COORDS = (800, 600)
 RESET_MOVE_DIMS = (200, 50)
@@ -239,11 +234,11 @@ def display_people(GameBoard: Board):
     for x in range(len(GameBoard.States)):
         if GameBoard.States[x].person != None:
             p = GameBoard.States[x].person
-            char = "Assets/" + IMAGE_ASSETS[0]
-            if p.isVaccinated:
-                char = "Assets/" + IMAGE_ASSETS[1]
-            elif p.isZombie:
-                char = "Assets/" + IMAGE_ASSETS[2]
+            char = "Assets/person_normal.png"
+            if p.isZombie:
+                char = "Assets/person_zombie.png"
+            elif p.isVaccinated:
+                char = "Assets/person_vax.png"
             coords = (
                 int(x % GameBoard.rows) * GameBoard.display_cell_dimensions[0]
                 + GameBoard.display_border
@@ -254,8 +249,10 @@ def display_people(GameBoard: Board):
             )
             display_image(screen, char, (35, 60), coords)
 
-
-def display_win_screen(score):
+#Creates buttons that allow the player to quit or restart
+def display_win_screen():
+    restart_text = font.render('PLAY AGAIN', True, WHITE)
+    quit_text = font.render('QUIT', True, WHITE)
     screen.fill(BACKGROUND)
     screen.blit(
         font.render("You win!", True, WHITE),
@@ -265,11 +262,21 @@ def display_win_screen(score):
         font.render("There were no possible moves for the computer.", True, WHITE),
         (500, 400),
     )
-    screen.blit(
-        font.render("Your score was: " + str(score), True, WHITE),
-        (500, 450),
-    )
-    pygame.display.update()
+    
+    while True:
+        mouse = pygame.mouse.get_pos()
+        pygame.draw.rect(screen,BLACK,[500,450,200,100])
+        pygame.draw.rect(screen,BLACK,[500,600,200,100])
+        screen.blit(restart_text, (550, 475))
+        screen.blit(quit_text, (570, 625))
+        for i in pygame.event.get():
+            if i.type == pygame.MOUSEBUTTONDOWN:
+                if 500 <= mouse[0] <= 700 and 450 <= mouse[1] <= 550:
+                    return True
+                elif 500 <= mouse[0] <= 700 and 600 <= mouse[1] <= 700:
+                        return False
+                        break
+        pygame.display.update()
 
     # catch quit event
     while True:
@@ -277,8 +284,11 @@ def display_win_screen(score):
             if event.type == pygame.QUIT:
                 return
 
-
+#similar code, just for a loss case
 def display_lose_screen():
+    restart_text = font.render('PLAY AGAIN', True, WHITE)
+    quit_text = font.render('QUIT', True, WHITE)
+
     screen.fill(BACKGROUND)
     screen.blit(
         font.render("You lose!", True, WHITE),
@@ -288,7 +298,21 @@ def display_lose_screen():
         font.render("You had no possible moves...", True, WHITE),
         (500, 400),
     )
-    pygame.display.update()
+
+    while True:
+        mouse = pygame.mouse.get_pos()
+        pygame.draw.rect(screen,BLACK,[500,450,200,100])
+        pygame.draw.rect(screen,BLACK,[500,600,200,100])
+        screen.blit(restart_text, (550, 475))
+        screen.blit(quit_text, (570, 625))
+        for i in pygame.event.get():
+            if i.type == pygame.MOUSEBUTTONDOWN:
+                if 500 <= mouse[0] <= 700 and 450 <= mouse[1] <= 550:
+                    return True
+                elif 500 <= mouse[0] <= 700 and 600 <= mouse[1] <= 700:
+                        return False
+                        break
+        pygame.display.update()
 
     # catch quit event
     while True:
@@ -308,7 +332,9 @@ def get_reward(action):
         return -100
 
 def direction(coord1: Tuple[int, int], coord2: Tuple[int, int]):    
-    if coord2[1] > coord1[1]:
+    if coord1 == coord2:
+        return Direction.self
+    elif coord2[1] > coord1[1]:
         return Direction.down
     elif coord2[1] < coord1[1]:
         return Direction.up

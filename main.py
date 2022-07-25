@@ -48,8 +48,12 @@ while running:
         P = PF.run(GameBoard)
         if SELF_PLAY:
             if not GameBoard.containsPerson(bool(player_role.value)):
-                PF.display_lose_screen()
-                running = False
+                running = PF.display_lose_screen()
+                for state in GameBoard.States:
+                    state.person = None
+                    state.safeSpace = False
+                GameBoard.populate()
+                start = False
                 continue
             # Event Handling
             for event in P:
@@ -83,9 +87,8 @@ while running:
                                 else:
                                     continue
 
-                            # don't allow duplicate cells
-                            if action not in take_action:
-                                take_action.append(action)
+
+                            take_action.append(action)
                 if event.type == pygame.QUIT:
                     running = False
 
@@ -102,7 +105,7 @@ while running:
             if len(take_action) > 2:
                     directionToMove = PF.direction(take_action[1], take_action[2])
                     print("Implementing", take_action[0], "to", directionToMove)
-                    result = GameBoard.actionToFunction[take_action[0]](take_action[1], directionToMove)
+                    result = GameBoard.actionToFunction[take_action[0]](take_action[1], directionToMove, player_role)
                     print(f"did it succeed? {result[0]}")
                     print(result[0])
                     if result[0] is not False:
@@ -147,13 +150,18 @@ while running:
                     print("possible actions is", possible_actions)
 
                 # no valid moves, player wins
+                #Displays two buttons and allows the player to play again on a new randomized map
                 if (
                     len(possible_actions) == 0 
                     and len(possible_direction) == 0
                     and len(possible_move_coords) == 0
                 ):
-                    PF.display_win_screen(player_score)
-                    running = False
+                    running = PF.display_win_screen()
+                    for state in GameBoard.States:
+                        state.person = None
+                        state.safeSpace = False
+                    GameBoard.populate()
+                    start = False
                     continue
 
                 # Select the destination coordinates
@@ -162,9 +170,7 @@ while running:
                 # Implement the selected action
                 print("action chosen is", action)
                 print("move start coord is", move_coord)
-                
-                GameBoard.actionToFunction[action](move_coord, direction)
-
+                print(GameBoard.actionToFunction[action](move_coord, direction, computer_role))
                 print("stopping")
 
         # Update the display
@@ -248,3 +254,4 @@ while running:
                     print("loseCase")
                 if event.type == pygame.QUIT:
                     running = False
+pygame.display.quit()

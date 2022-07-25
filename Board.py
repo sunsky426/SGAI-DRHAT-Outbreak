@@ -1,5 +1,3 @@
-import imp
-from tracemalloc import start
 from State import State
 import random as rd
 from Person import Person
@@ -21,6 +19,12 @@ class Board:
         self.display_border = border
         self.display_cell_dimensions = cell_dimensions
         self.player_role = player_role
+
+        if player_role == Role.government:
+            self.computer_role = Role.zombie
+        else:
+            self.computer_role = Role.government
+
         self.population = 0 # total number of people and zombies
         self.States = []
         self.QTable = []
@@ -79,7 +83,7 @@ class Board:
 
                     if (
                         state.person.isZombie
-                        and B.actionToFunction[action](B.toCoord(state.location), direction)[0]
+                        and B.actionToFunction[action](B.toCoord(state.location), direction, role)[0]
                     ):
                         poss.append(B.toCoord(state.location))
                         changed_states = True
@@ -176,11 +180,16 @@ class Board:
         elif direction == Direction.right:
             new_coords = (coords[0] + 1, coords[1])
             print(f"going from {coords} to new coords {new_coords}")
+        elif direction == Direction.self:
+            new_coords = coords
         
+        self.States[self.toIndex(coords)].person.facing = Direction
+
         return new_coords
     
-    def move(self, coords: Tuple[int, int], direction: Direction) -> Tuple[bool, int]:    
+    def move(self, coords: Tuple[int, int], direction: Direction, role: Role) -> Tuple[bool, int]:    
         new_coords = self.getTargetCoords(coords, direction)
+        if direction == Direction.self: return (False, new_coords)
         if not self.isValidCoordinate(new_coords): return (False, new_coords)
         
         # Get the start and destination index (1D)
@@ -191,7 +200,7 @@ class Board:
         if not self.isValidCoordinate(new_coords):
             return [False, destination_idx]
         if(
-            self.player_role == Role.zombie
+            role == Role.zombie
             and self.States[destination_idx].safeSpace
         ):
             return [False, destination_idx]
@@ -262,8 +271,9 @@ class Board:
                     d = rd.randint(0, len(self.States))
             return d
 
-    def bite(self, coords: Tuple[int, int], direction: Direction) -> Tuple[bool, int]:
+    def bite(self, coords: Tuple[int, int], direction: Direction, role: Role) -> Tuple[bool, int]:
         target_coords = self.getTargetCoords(coords, direction)
+        if direction == Direction.self: return (False, target_coords)
         if not self.isValidCoordinate(target_coords): return (False, target_coords)
         
         # Get the start and destination index (1D)
@@ -305,7 +315,7 @@ class Board:
             self.States[target_idx].person = newTarget
         return [True, target_idx]
 
-    def heal(self, coords: Tuple[int, int], direction: Direction) -> Tuple[bool, int]:
+    def heal(self, coords: Tuple[int, int], direction: Direction, role: Role) -> Tuple[bool, int]:
         """
         the person at the stated coordinate heals the zombie to the person's stated direction
         If no person is selected, then return [False, None]
@@ -322,6 +332,7 @@ class Board:
         if (
             self.States[start_idx].person is None
             or self.States[start_idx].person.isZombie
+            or self.States[start_idx].safeSpace
         ):
             return[False, target_idx]
         
@@ -329,12 +340,15 @@ class Board:
         # Check if the destination is valid
         if (
             self.States[target_idx].person is None
-            or not self.States[target_idx].person.isZombie
         ):
             return [False, target_idx]
             
         #probability of heal vs failed heal
-        chance = 50
+        if self.States[target_idx].person.isZombie:
+            chance = 50
+        else:
+            chance = 100
+        
         r = rd.randint(0, 100)
         if r < chance:
             #implement heal
@@ -350,8 +364,9 @@ class Board:
             return [False, target_idx]
         return [True, target_idx]
 
-    def kill(self, coords: Tuple[int, int], direction: Direction) -> Tuple[bool, int]:
+    def kill(self, coords: Tuple[int, int], direction: Direction, role: Role) -> Tuple[bool, int]:
         target_coords = self.getTargetCoords(coords, direction)
+        if direction == Direction.self: return (False, target_coords)
         if not self.isValidCoordinate(target_coords): return (False, target_coords)
         
         # Get the start and destination index (1D)
@@ -362,6 +377,7 @@ class Board:
         if (
             self.States[start_idx].person is None
             or self.States[start_idx].person.isZombie
+            or self.States[start_idx].safeSpace
         ):
             return[False, target_idx]
         
