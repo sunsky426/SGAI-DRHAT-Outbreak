@@ -81,9 +81,8 @@ while running:
                                 else:
                                     continue
 
-                            # don't allow duplicate cells
-                            if action not in take_action:
-                                take_action.append(action)
+
+                            take_action.append(action)
                 if event.type == pygame.QUIT:
                     running = False
 
