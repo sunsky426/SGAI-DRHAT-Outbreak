@@ -236,8 +236,8 @@ def display_people(GameBoard: Board):
             p = GameBoard.States[x].person
             char = "Assets/person_normal.png"
             if p.isZombie:
-                char = "Assets/zom.png"
-            elif p.isVaccincated:
+                char = "Assets/person_zombie.png"
+            elif p.isVaccinated:
                 char = "Assets/person_vax.png"
             coords = (
                 int(x % GameBoard.rows) * GameBoard.display_cell_dimensions[0]
