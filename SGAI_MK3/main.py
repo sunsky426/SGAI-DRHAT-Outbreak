@@ -155,20 +155,6 @@ while running:
 
                 print("stopping")
 
-            # Update the display
-            pygame.display.update()
-            
-            # Select the destination coordinates
-            move_coord = rd.choice(possible_move_coords)
-
-            # Implement the selected action
-            print("action chosen is", action)
-            print("move start coord is", move_coord)
-            
-            GameBoard.actionToFunction[action](move_coord, direction)
-
-            print("stopping")
-
         # Update the display
         pygame.display.update()
         pygame.time.wait(75)
