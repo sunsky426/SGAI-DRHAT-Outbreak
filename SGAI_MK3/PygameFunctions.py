@@ -254,8 +254,10 @@ def display_people(GameBoard: Board):
             )
             display_image(screen, char, (35, 60), coords)
 
-
+#Creates buttons that allow the player to quit or restart
 def display_win_screen():
+    restart_text = font.render('PLAY AGAIN', True, WHITE)
+    quit_text = font.render('QUIT', True, WHITE)
     screen.fill(BACKGROUND)
     screen.blit(
         font.render("You win!", True, WHITE),
@@ -265,16 +267,30 @@ def display_win_screen():
         font.render("There were no possible moves for the computer.", True, WHITE),
         (500, 400),
     )
-    pygame.display.update()
-
+    while True:
+        mouse = pygame.mouse.get_pos()
+        pygame.draw.rect(screen,BLACK,[500,450,200,100])
+        pygame.draw.rect(screen,BLACK,[500,600,200,100])
+        screen.blit(restart_text, (550, 475))
+        screen.blit(quit_text, (570, 625))
+        for i in pygame.event.get():
+            if i.type == pygame.MOUSEBUTTONDOWN:
+                if 500 <= mouse[0] <= 700 and 450 <= mouse[1] <= 550:
+                    return True
+                elif 500 <= mouse[0] <= 700 and 600 <= mouse[1] <= 700:
+                        return False
+                        break
+        pygame.display.update()
     # catch quit event
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return
 
-
+#similar code, just for a loss case
 def display_lose_screen():
+    restart_text = font.render('PLAY AGAIN', True, WHITE)
+    quit_text = font.render('QUIT', True, WHITE)
     screen.fill(BACKGROUND)
     screen.blit(
         font.render("You lose!", True, WHITE),
@@ -284,13 +300,26 @@ def display_lose_screen():
         font.render("You had no possible moves...", True, WHITE),
         (500, 400),
     )
-    pygame.display.update()
-
+    while True:
+        mouse = pygame.mouse.get_pos()
+        pygame.draw.rect(screen,BLACK,[500,450,200,100])
+        pygame.draw.rect(screen,BLACK,[500,600,200,100])
+        screen.blit(restart_text, (550, 475))
+        screen.blit(quit_text, (570, 625))
+        for i in pygame.event.get():
+            if i.type == pygame.MOUSEBUTTONDOWN:
+                if 500 <= mouse[0] <= 700 and 450 <= mouse[1] <= 550:
+                    return True
+                elif 500 <= mouse[0] <= 700 and 600 <= mouse[1] <= 700:
+                        return False
+                        break
+        pygame.display.update()
     # catch quit event
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return
+
 
 def direction(coord1: Tuple[int, int], coord2: Tuple[int, int]):    
     if coord2[1] > coord1[1]:

@@ -43,8 +43,12 @@ while running:
         P = PF.run(GameBoard)
         if SELF_PLAY:
             if not GameBoard.containsPerson(bool(player_role.value)):
-                PF.display_lose_screen()
-                running = False
+                running = PF.display_lose_screen()
+                for state in GameBoard.States:
+                    state.person = None
+                    state.safeSpace = False
+                GameBoard.populate()
+                start = False
                 continue
             # Event Handling
             for event in P:
@@ -135,13 +139,18 @@ while running:
                     print("possible actions is", possible_actions)
 
                 # no valid moves, player wins
+                #Displays two buttons and allows the player to play again on a new randomized map
                 if (
                     len(possible_actions) == 0 
                     and len(possible_direction) == 0
                     and len(possible_move_coords) == 0
                 ):
-                    PF.display_win_screen()
-                    running = False
+                    running = PF.display_win_screen()
+                    for state in GameBoard.States:
+                        state.person = None
+                        state.safeSpace = False
+                    GameBoard.populate()
+                    start = False
                     continue
 
                 # Select the destination coordinates
@@ -236,3 +245,4 @@ while running:
                     print("loseCase")
                 if event.type == pygame.QUIT:
                     running = False
+pygame.display.quit()
