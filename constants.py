@@ -11,7 +11,6 @@ class Action(enum.Enum):
     bite = 2
     heal = 3
     kill = 4
-    med = 5
 
 class Direction(enum.Enum):
     self = 0
@@ -25,7 +24,6 @@ class Role(enum.Enum):
     zombie = 1
 
 reverse_dir = {
-    Direction.self: Direction.self,
     Direction.up: Direction.down,
     Direction.down: Direction.up,
     Direction.left: Direction.right,
