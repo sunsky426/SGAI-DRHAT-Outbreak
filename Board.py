@@ -443,22 +443,20 @@ class Board:
                 
         #turn half the humans into zombies
         allzombs = rd.sample(range(len(allppl)), len(allppl)//2)
-        for person in range(len(allppl)):
-            if person in allzombs:
-                self.States[allppl[person]].person.isZombie = True
+        for person in allzombs:
+            self.States[allppl[person]].person.isZombie = True
 
-        #add two safe spaces
-        noZombieInSafe = False
-        while not noZombieInSafe:
-            allsafes = rd.sample(range(len(self.States)), rd.randint(1, (self.rows*self.columns)//15))
-            for state in range(len(self.States)):
-                if (
-                    self.States[state].person is not None
-                    and self.States[state].person.isZombie
-                ):
-                    continue
-                else:
-                    noZombieInSafe = True
+        #add one or boardSize/15 safe spaces
+        allsafes = []
+        for space in range(2):#rd.randint(1, (self.rows*self.columns)//15)):
+            print("hi")
+            print(allsafes)
+            allsafes.append(rd.randint(0, len(self.States)))
+            while allsafes[-1] in allsafes[0:-1] or allsafes[-1] in allppl:
+                allsafes.remove(allsafes[-1])
+                allsafes.append(rd.randint(0, len(self.States)))
 
-                if state in allsafes:
-                    self.States[state].safeSpace = True
+        
+        for safe in allsafes:    
+            self.States[safe].safeSpace = True
+        
