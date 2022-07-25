@@ -1,4 +1,3 @@
-from msilib.schema import Class
 import pygame
 from Board import Board
 import PygameFunctions as PF
