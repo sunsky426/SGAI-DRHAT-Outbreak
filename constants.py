@@ -11,6 +11,7 @@ class Action(enum.Enum):
     bite = 2
     heal = 3
     kill = 4
+    med = 5
 
 class Direction(enum.Enum):
     self = 0

@@ -1,3 +1,4 @@
+from multiprocessing.reduction import steal_handle
 from State import State
 import random as rd
 from Person import Person
@@ -331,6 +332,7 @@ class Board:
         #check if the orgin is valid
         if (
             self.States[start_idx].person is None
+            or self.States[start_idx].person.hasMed == False
             or self.States[start_idx].person.isZombie
             or self.States[start_idx].safeSpace
         ):
@@ -361,6 +363,9 @@ class Board:
         else:
             #implement failed heal
             self.bite(target_coords, reverse_dir[direction], role)
+        
+        self.States[start_idx].person.hasMed = False
+
         return [True, target_idx]
 
     def kill(self, coords: Tuple[int, int], direction: Direction, role: Role) -> Tuple[bool, int]:
@@ -391,6 +396,16 @@ class Board:
         # Execute Kill
         self.States[target_idx].person = None
         return [True, target_idx]
+
+    def med(self):
+        for idx in range(len(self.States)):
+                state = self.States[idx]
+                if(
+                    state.safeSpace == True
+                    and state.person is not None
+                ):
+                    state.person.hasMed = True
+                self.States[idx] = state
 
     #gets all the locations of people or zombies on the board (this can be used to count them as well)
     def get_possible_states(self, role_number: int):
