@@ -11,11 +11,6 @@ WHITE = (255, 255, 255)
 CELL_COLOR = (233, 222, 188)
 SAFE_COLOR = (93, 138, 168)
 LINE_WIDTH = 5
-IMAGE_ASSETS = [
-    "person_normal.png",
-    "person_vax.png",
-    "person_zombie.png",
-]
 GAME_WINDOW_DIMENSIONS = (1200, 800)
 RESET_MOVE_COORDS = (800, 600)
 RESET_MOVE_DIMS = (200, 50)
@@ -239,11 +234,11 @@ def display_people(GameBoard: Board):
     for x in range(len(GameBoard.States)):
         if GameBoard.States[x].person != None:
             p = GameBoard.States[x].person
-            char = "Assets/" + IMAGE_ASSETS[0]
-            if p.isVaccinated:
-                char = "Assets/" + IMAGE_ASSETS[1]
-            elif p.isZombie:
-                char = "Assets/" + IMAGE_ASSETS[2]
+            char = "Assets/person_normal.png"
+            if p.isZombie:
+                char = "Assets/zom.png"
+            elif p.isVaccincated:
+                char = "Assets/person_vax.png"
             coords = (
                 int(x % GameBoard.rows) * GameBoard.display_cell_dimensions[0]
                 + GameBoard.display_border
