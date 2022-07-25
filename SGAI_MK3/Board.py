@@ -176,11 +176,14 @@ class Board:
         elif direction == Direction.right:
             new_coords = (coords[0] + 1, coords[1])
             print(f"going from {coords} to new coords {new_coords}")
+        elif direction == Direction.self:
+            new_coords = coords
         
         return new_coords
     
     def move(self, coords: Tuple[int, int], direction: Direction) -> Tuple[bool, int]:    
         new_coords = self.getTargetCoords(coords, direction)
+        if direction == Direction.self: return (False, new_coords)
         if not self.isValidCoordinate(new_coords): return (False, new_coords)
         
         # Get the start and destination index (1D)
@@ -264,6 +267,7 @@ class Board:
 
     def bite(self, coords: Tuple[int, int], direction: Direction) -> Tuple[bool, int]:
         target_coords = self.getTargetCoords(coords, direction)
+        if direction == Direction.self: return (False, target_coords)
         if not self.isValidCoordinate(target_coords): return (False, target_coords)
         
         # Get the start and destination index (1D)
@@ -329,12 +333,15 @@ class Board:
         # Check if the destination is valid
         if (
             self.States[target_idx].person is None
-            or not self.States[target_idx].person.isZombie
         ):
             return [False, target_idx]
             
         #probability of heal vs failed heal
-        chance = 50
+        if self.States[target_idx].person.isZombie:
+            chance = 50
+        else:
+            chance = 100
+        
         r = rd.randint(0, 100)
         if r < chance:
             #implement heal
@@ -351,6 +358,7 @@ class Board:
 
     def kill(self, coords: Tuple[int, int], direction: Direction) -> Tuple[bool, int]:
         target_coords = self.getTargetCoords(coords, direction)
+        if direction == Direction.self: return (False, target_coords)
         if not self.isValidCoordinate(target_coords): return (False, target_coords)
         
         # Get the start and destination index (1D)
