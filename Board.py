@@ -1,5 +1,3 @@
-import imp
-from tracemalloc import start
 from State import State
 import random as rd
 from Person import Person
@@ -183,7 +181,7 @@ class Board:
         
         return new_coords
     
-    def move(self, coords: Tuple[int, int], direction: Direction, user_role: Role) -> Tuple[bool, int]:    
+    def move(self, coords: Tuple[int, int], direction: Direction, role: Role) -> Tuple[bool, int]:    
         new_coords = self.getTargetCoords(coords, direction)
         if not self.isValidCoordinate(new_coords): return (False, new_coords)
         
@@ -195,7 +193,7 @@ class Board:
         if not self.isValidCoordinate(new_coords):
             return [False, destination_idx]
         if(
-            user_role == Role.zombie
+            role == Role.zombie
             and self.States[destination_idx].safeSpace
         ):
             return [False, destination_idx]
@@ -351,7 +349,7 @@ class Board:
             self.States[target_idx].person = newTarget
         else:
             #implement failed heal
-            self.bite(target_coords, reverse_dir[direction])
+            self.bite(target_coords, reverse_dir[direction], role)
         return [True, target_idx]
 
     def kill(self, coords: Tuple[int, int], direction: Direction, role: Role) -> Tuple[bool, int]:
