@@ -98,7 +98,7 @@ while running:
             if len(take_action) > 2:
                     directionToMove = PF.direction(take_action[1], take_action[2])
                     print("Implementing", take_action[0], "to", directionToMove)
-                    result = GameBoard.actionToFunction[take_action[0]](take_action[1], directionToMove)
+                    result = GameBoard.actionToFunction[take_action[0]](take_action[1], directionToMove, player_role)
                     print(f"did it succeed? {result[0]}")
                     if result[0] is not False:
                         playerMoved = True
@@ -158,9 +158,7 @@ while running:
                 # Implement the selected action
                 print("action chosen is", action)
                 print("move start coord is", move_coord)
-                
-                GameBoard.actionToFunction[action](move_coord, direction)
-
+                print(GameBoard.actionToFunction[action](move_coord, direction, computer_role))
                 print("stopping")
 
         # Update the display
