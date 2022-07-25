@@ -151,7 +151,7 @@ while running:
                 print("action chosen is", action)
                 print("move start coord is", move_coord)
                 
-                GameBoard.actionToFunction[action](move_coord, direction)
+                print(GameBoard.actionToFunction[action](move_coord, direction))
 
                 print("stopping")
 

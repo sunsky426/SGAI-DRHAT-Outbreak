@@ -21,6 +21,10 @@ class Board:
         self.display_border = border
         self.display_cell_dimensions = cell_dimensions
         self.player_role = player_role
+        if player_role == Role.government:
+            self.computer_role = Role.zombie
+        else:
+            self.computer_role = Role.government
         self.population = 0 # total number of people and zombies
         self.States = []
         self.QTable = []
@@ -191,7 +195,7 @@ class Board:
         if not self.isValidCoordinate(new_coords):
             return [False, destination_idx]
         if(
-            self.player_role == Role.zombie
+            self.computer_role == Role.zombie
             and self.States[destination_idx].safeSpace
         ):
             return [False, destination_idx]
@@ -436,7 +440,7 @@ class Board:
         #add two safe spaces
         noZombieInSafe = False
         while not noZombieInSafe:
-            allsafes = rd.sample(range(len(self.States)), rd.randint(1, (self.rows*self.columns)//15))
+            allsafes = rd.sample(range(len(self.States)), rd.randint(1, (self.rows*self.columns)//5))
             for state in range(len(self.States)):
                 if (
                     self.States[state].person is not None
