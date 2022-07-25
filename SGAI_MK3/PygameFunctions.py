@@ -232,6 +232,10 @@ def display_win_screen():
     screen.fill(BACKGROUND)
     screen.blit(
         font.render("You win!", True, WHITE),
+        (500, 350),
+    )
+    screen.blit(
+        font.render("There were no possible moves for the computer.", True, WHITE),
         (500, 400),
     )
     pygame.display.update()
@@ -247,6 +251,10 @@ def display_lose_screen():
     screen.fill(BACKGROUND)
     screen.blit(
         font.render("You lose!", True, WHITE),
+        (500, 350),
+    )
+    screen.blit(
+        font.render("You had no possible moves...", True, WHITE),
         (500, 400),
     )
     pygame.display.update()
