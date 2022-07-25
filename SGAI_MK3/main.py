@@ -28,113 +28,136 @@ running = True
 take_action = []
 playerMoved = False
 font = pygame.font.SysFont("Comic Sans", 20)
-
+start = False
 
 while running:
-    P = PF.run(GameBoard)
-    if SELF_PLAY:
-        if not GameBoard.containsPerson(bool(player_role.value)):
-            PF.display_lose_screen()
-            running = False
-            continue
-        # Event Handling
-        for event in P:
-            if event.type == pygame.MOUSEBUTTONUP:
-                x, y = pygame.mouse.get_pos()
-                action = PF.get_action(GameBoard, x, y)
-
-                if(
-                    type(action) == Action
-                    and len(take_action) == 0
-                ):
-                    # only allow healing by itself (prevents things like ['move', (4, 1), 'heal'])
-                    take_action.append(action)
-
-                elif action == "reset move":
-                    take_action = []
-                    
-                elif type(action) is tuple:
-                    idx = GameBoard.toIndex(action)
-                    # action is a coordinate
-                    if idx < (GameBoard.rows * GameBoard.columns) and idx > -1:
-                        if Action.move not in take_action and len(take_action) == 0:
-                            # make sure that the space is not an empty space or a space of the opposite team
-                            # since cannot start a move from those invalid spaces
-                            if (
-                                GameBoard.States[idx].person is not None
-                                and GameBoard.States[idx].person.isZombie
-                                == bool(player_role.value)
-                            ):
-                                take_action.append(Action.move)
-                            else:
-                                continue
-
-                        # don't allow duplicate cells
-                        if action not in take_action:
-                            take_action.append(action)
-            if event.type == pygame.QUIT:
-                running = False
-
-        # Display the current action
-        PF.screen.blit(
-            font.render("Your move is currently:", True, PF.WHITE),
-            (800, 400),
-        )
-        PF.screen.blit(font.render(f"{take_action}", True, PF.WHITE), (800, 450))
-
-        # Action handling
-        if len(take_action) > 2:
-                directionToMove = PF.direction(take_action[1], take_action[2])
-                print("Implementing", take_action[0], "to", directionToMove)
-                result = GameBoard.actionToFunction[take_action[0]](take_action[1], directionToMove)
-                print(f"did it succeed? {result[0]}")
-                if result[0] is not False:
-                    playerMoved = True
-                take_action = []
-
-        if playerMoved:
-            # Intermission
-            PF.run(GameBoard)
-            pygame.display.update()
-            time.sleep(0.1)
-            print("Enemy turn")
-
-            # Computer turn
-            playerMoved = False
-            take_action = []
-
-            if player_role == Role.government:
-                possible_actions = [Action.move, Action.bite]
-                computer_role = Role.zombie
-            else:
-                possible_actions = [Action.move, Action.heal, Action.kill]
-                computer_role = Role.government
-
-            possible_move_coords = []
-            #Cycles through actions
-            while len(possible_move_coords) == 0 and len(possible_actions) != 0:
-                possible_direction = [member for name, member in Direction.__members__.items()]
-                action = rd.choice(possible_actions)
-                #cycles through directions
-                while len(possible_move_coords) == 0 and len(possible_direction) != 0:
-                    direction = rd.choice(possible_direction)
-                    possible_direction.remove(direction)
-                    possible_move_coords = GameBoard.get_possible_moves(
-                        action, direction, computer_role
-                    )
-                possible_actions.remove(action)
-                print("possible actions is", possible_actions)
-
-            # no valid moves, player wins
-            if (
-                len(possible_actions) == 0 
-                and len(possible_direction) == 0
-                and len(possible_move_coords) == 0
-            ):
-                PF.display_win_screen()
+    #displays the main menu until user hits start or quit
+    if start == False:
+        try:
+            start = PF.disp_title_screen()
+        #Throws exception when user quits program using in-game button
+        except pygame.error:
+            print("Game closed by user")
+            break
+    elif start == True:
+        P = PF.run(GameBoard)
+        if SELF_PLAY:
+            if not GameBoard.containsPerson(bool(player_role.value)):
+                PF.display_lose_screen()
                 running = False
                 continue
+            # Event Handling
+            for event in P:
+                if event.type == pygame.MOUSEBUTTONUP:
+                    x, y = pygame.mouse.get_pos()
+                    action = PF.get_action(GameBoard, x, y)
 
+                    if(
+                        type(action) == Action
+                        and len(take_action) == 0
+                    ):
+                        # only allow healing by itself (prevents things like ['move', (4, 1), 'heal'])
+                        take_action.append(action)
+
+                    elif action == "reset move":
+                        take_action = []
+                        
+                    elif type(action) is tuple:
+                        idx = GameBoard.toIndex(action)
+                        # action is a coordinate
+                        if idx < (GameBoard.rows * GameBoard.columns) and idx > -1:
+                            if Action.move not in take_action and len(take_action) == 0:
+                                # make sure that the space is not an empty space or a space of the opposite team
+                                # since cannot start a move from those invalid spaces
+                                if (
+                                    GameBoard.States[idx].person is not None
+                                    and GameBoard.States[idx].person.isZombie
+                                    == bool(player_role.value)
+                                ):
+                                    take_action.append(Action.move)
+                                else:
+                                    continue
+
+                            # don't allow duplicate cells
+                            if action not in take_action:
+                                take_action.append(action)
+                if event.type == pygame.QUIT:
+                    running = False
+
+            # Display the current action
+            PF.screen.blit(
+                font.render("Your move is currently:", True, PF.WHITE),
+                (800, 400),
+            )
+            PF.screen.blit(font.render(f"{take_action}", True, PF.WHITE), (800, 450))
+
+            # Action handling
+            if len(take_action) > 2:
+                    directionToMove = PF.direction(take_action[1], take_action[2])
+                    print("Implementing", take_action[0], "to", directionToMove)
+                    result = GameBoard.actionToFunction[take_action[0]](take_action[1], directionToMove)
+                    print(f"did it succeed? {result[0]}")
+                    if result[0] is not False:
+                        playerMoved = True
+                    take_action = []
+
+            if playerMoved:
+                # Intermission
+                PF.run(GameBoard)
+                pygame.display.update()
+                time.sleep(0.1)
+                print("Enemy turn")
+
+                # Computer turn
+                playerMoved = False
+                take_action = []
+
+                if player_role == Role.government:
+                    possible_actions = [Action.move, Action.bite]
+                    computer_role = Role.zombie
+                else:
+                    possible_actions = [Action.move, Action.heal, Action.kill]
+                    computer_role = Role.government
+
+                possible_move_coords = []
+                #Cycles through actions
+                while len(possible_move_coords) == 0 and len(possible_actions) != 0:
+                    possible_direction = [member for name, member in Direction.__members__.items()]
+                    action = rd.choice(possible_actions)
+                    #cycles through directions
+                    while len(possible_move_coords) == 0 and len(possible_direction) != 0:
+                        direction = rd.choice(possible_direction)
+                        possible_direction.remove(direction)
+                        possible_move_coords = GameBoard.get_possible_moves(
+                            action, direction, computer_role
+                        )
+                    possible_actions.remove(action)
+                    print("possible actions is", possible_actions)
+
+                # no valid moves, player wins
+                if (
+                    len(possible_actions) == 0 
+                    and len(possible_direction) == 0
+                    and len(possible_move_coords) == 0
+                ):
+                    PF.display_win_screen()
+                    running = False
+                    continue
+
+                # Select the destination coordinates
+                move_coord = rd.choice(possible_move_coords)
+
+                # Implement the selected action
+                print("action chosen is", action)
+                print("move start coord is", move_coord)
+                
+                GameBoard.actionToFunction[action](move_coord, direction)
+
+                print("stopping")
+
+            # Update the display
+            pygame.display.update()
+            
             # Select the destination coordinates
             move_coord = rd.choice(possible_move_coords)
 
@@ -209,18 +232,21 @@ while running:
             if player_role == Role.government:
                 r = rd.randint(0, 5)
                 while r == 4:
-                    r = rd.randint(0, 5)
-                ta = ACTION_SPACE[r]
-            else:
-                r = rd.randint(0, 4)
-                ta = ACTION_SPACE[r]
-            poss = GameBoard.get_possible_moves(ta, Role.zombie)
 
-            if len(poss) > 0:
-                r = rd.randint(0, len(poss) - 1)
-                a = poss[r]
-                GameBoard.actionToFunction[ta](a)
-            if GameBoard.num_zombies() == GameBoard.population:
-                print("loseCase")
-            if event.type == pygame.QUIT:
-                running = False
+                    r = rd.randint(0, 5)
+                    while r == 4:
+                        r = rd.randint(0, 5)
+                    ta = ACTION_SPACE[r]
+                else:
+                    r = rd.randint(0, 4)
+                    ta = ACTION_SPACE[r]
+                poss = GameBoard.get_possible_moves(ta, Role.zombie)
+
+                if len(poss) > 0:
+                    r = rd.randint(0, len(poss) - 1)
+                    a = poss[r]
+                    GameBoard.actionToFunction[ta](a)
+                if GameBoard.num_zombies() == GameBoard.population:
+                    print("loseCase")
+                if event.type == pygame.QUIT:
+                    running = False

@@ -89,6 +89,33 @@ def run(GameBoard: Board):
     
     return pygame.event.get()
 
+
+def disp_title_screen():
+    """
+    Displays a basic title screen with title, start button, and quit button
+    """
+    start_text = font.render('START', True, WHITE)
+    quit_text = font.render('QUIT', True, WHITE)
+    screen.fill(BACKGROUND)
+    #Draw title
+    display_image(screen, "Assets/Outbreak_title.png", (1048, 238), (76, 100))
+    #Check if the user has clicked either start or quit
+    while True:
+        mouse = pygame.mouse.get_pos()
+        #Draw the start and quit buttons (They might need a little bit more work at some point, they're not centered well)
+        pygame.draw.rect(screen,BLACK,[500,350,200,100])
+        pygame.draw.rect(screen,BLACK,[500,500,200,100])
+        screen.blit(start_text, (560, 375))
+        screen.blit(quit_text, (570, 525))
+        for i in pygame.event.get():
+            if i.type == pygame.MOUSEBUTTONDOWN:
+                if 500 <= mouse[0] <= 700 and 350 <= mouse[1] <= 450:
+                    return True
+                elif 500 <= mouse[0] <= 700 and 500 <= mouse[1] <= 600:
+                        pygame.display.quit()
+                        break
+        pygame.display.update()
+
 def display_safe_space(GameBoard):
     """
     Creates a blue rectangle at every safe space state
