@@ -1,10 +1,11 @@
-from msilib.schema import Class
 import pygame
 from Board import Board
 import PygameFunctions as PF
 import random as rd
 from Constants import *
 import time
+
+from PygameFunctions import get_reward
 
 # Player role variables
 player_role = Role.government  # Valid options are Role.government and Role.zombie
@@ -29,6 +30,10 @@ take_action = []
 playerMoved = False
 font = pygame.font.SysFont("Comic Sans", 20)
 start = False
+
+#Initial player score
+player_score = 0
+
 
 while running:
     #displays the main menu until user hits start or quit
@@ -91,16 +96,23 @@ while running:
             )
             PF.screen.blit(font.render(f"{take_action}", True, PF.WHITE), (800, 450))
 
+            
+
             # Action handling
             if len(take_action) > 2:
                     directionToMove = PF.direction(take_action[1], take_action[2])
                     print("Implementing", take_action[0], "to", directionToMove)
                     result = GameBoard.actionToFunction[take_action[0]](take_action[1], directionToMove)
                     print(f"did it succeed? {result[0]}")
+                    print(result[0])
                     if result[0] is not False:
                         playerMoved = True
+                        player_score += get_reward(take_action[0])
+                        #if it succeeds, the player gets a reward corresponding to their action
                     take_action = []
-
+            #Display the player's current score
+            PF.screen.blit(font.render("Score: " + str(player_score), True, PF.WHITE),(900,500))
+            
             if playerMoved:
                 # Intermission
                 PF.run(GameBoard)

@@ -347,6 +347,7 @@ class Board:
         else:
             #implement failed heal
             self.bite(target_coords, reverse_dir[direction])
+            return [False, target_idx]
         return [True, target_idx]
 
     def kill(self, coords: Tuple[int, int], direction: Direction) -> Tuple[bool, int]:
