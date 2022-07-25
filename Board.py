@@ -21,6 +21,10 @@ class Board:
         self.display_border = border
         self.display_cell_dimensions = cell_dimensions
         self.player_role = player_role
+        if player_role == Role.government:
+            self.computer_role = Role.zombie
+        else:
+            self.computer_role = Role.government
         self.population = 0 # total number of people and zombies
         self.States = []
         self.QTable = []
@@ -79,7 +83,7 @@ class Board:
 
                     if (
                         state.person.isZombie
-                        and B.actionToFunction[action](B.toCoord(state.location), direction)[0]
+                        and B.actionToFunction[action](B.toCoord(state.location), direction, role)[0]
                     ):
                         poss.append(B.toCoord(state.location))
                         changed_states = True
@@ -179,7 +183,7 @@ class Board:
         
         return new_coords
     
-    def move(self, coords: Tuple[int, int], direction: Direction) -> Tuple[bool, int]:    
+    def move(self, coords: Tuple[int, int], direction: Direction, user_role: Role) -> Tuple[bool, int]:    
         new_coords = self.getTargetCoords(coords, direction)
         if not self.isValidCoordinate(new_coords): return (False, new_coords)
         
@@ -191,7 +195,7 @@ class Board:
         if not self.isValidCoordinate(new_coords):
             return [False, destination_idx]
         if(
-            self.player_role == Role.zombie
+            user_role == Role.zombie
             and self.States[destination_idx].safeSpace
         ):
             return [False, destination_idx]
@@ -262,7 +266,7 @@ class Board:
                     d = rd.randint(0, len(self.States))
             return d
 
-    def bite(self, coords: Tuple[int, int], direction: Direction) -> Tuple[bool, int]:
+    def bite(self, coords: Tuple[int, int], direction: Direction, role: Role) -> Tuple[bool, int]:
         target_coords = self.getTargetCoords(coords, direction)
         if not self.isValidCoordinate(target_coords): return (False, target_coords)
         
@@ -305,7 +309,7 @@ class Board:
             self.States[target_idx].person = newTarget
         return [True, target_idx]
 
-    def heal(self, coords: Tuple[int, int], direction: Direction) -> Tuple[bool, int]:
+    def heal(self, coords: Tuple[int, int], direction: Direction, role: Role) -> Tuple[bool, int]:
         """
         the person at the stated coordinate heals the zombie to the person's stated direction
         If no person is selected, then return [False, None]
@@ -322,6 +326,7 @@ class Board:
         if (
             self.States[start_idx].person is None
             or self.States[start_idx].person.isZombie
+            or self.States[start_idx].safeSpace
         ):
             return[False, target_idx]
         
@@ -349,7 +354,7 @@ class Board:
             self.bite(target_coords, reverse_dir[direction])
         return [True, target_idx]
 
-    def kill(self, coords: Tuple[int, int], direction: Direction) -> Tuple[bool, int]:
+    def kill(self, coords: Tuple[int, int], direction: Direction, role: Role) -> Tuple[bool, int]:
         target_coords = self.getTargetCoords(coords, direction)
         if not self.isValidCoordinate(target_coords): return (False, target_coords)
         
@@ -361,6 +366,7 @@ class Board:
         if (
             self.States[start_idx].person is None
             or self.States[start_idx].person.isZombie
+            or self.States[start_idx].safeSpace
         ):
             return[False, target_idx]
         
@@ -434,7 +440,7 @@ class Board:
         #add two safe spaces
         noZombieInSafe = False
         while not noZombieInSafe:
-            allsafes = rd.sample(range(len(self.States)), rd.randint(1, (self.rows*self.columns)//15))
+            allsafes = rd.sample(range(len(self.States)), rd.randint(1, (self.rows*self.columns)//5))
             for state in range(len(self.States)):
                 if (
                     self.States[state].person is not None
