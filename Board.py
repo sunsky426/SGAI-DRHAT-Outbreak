@@ -322,6 +322,7 @@ class Board:
         if (
             self.States[start_idx].person is None
             or self.States[start_idx].person.isZombie
+            or self.States[start_idx].safeSpace
         ):
             return[False, target_idx]
         
@@ -361,6 +362,7 @@ class Board:
         if (
             self.States[start_idx].person is None
             or self.States[start_idx].person.isZombie
+            or self.States[start_idx].safeSpace
         ):
             return[False, target_idx]
         
