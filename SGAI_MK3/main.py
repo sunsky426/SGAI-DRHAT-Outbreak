@@ -157,64 +157,82 @@ while running:
 
             # Update the display
             pygame.display.update()
+            
+            # Select the destination coordinates
+            move_coord = rd.choice(possible_move_coords)
 
-        else:
-            if epochs_ran % 100 == 0:
-                print("Board Reset!")
-                GameBoard = Original_Board  # reset environment
-            for event in P:
-                i = 0
-                r = rd.uniform(0.0, 1.0)
-                st = rd.randint(0, len(GameBoard.States) - 1)
-                state = GameBoard.QTable[st]
+            # Implement the selected action
+            print("action chosen is", action)
+            print("move start coord is", move_coord)
+            
+            GameBoard.actionToFunction[action](move_coord, direction)
 
-                if r < gamma:
-                    while GameBoard.States[st].person is None:
-                        st = rd.randint(0, len(GameBoard.States) - 1)
-                else:
-                    biggest = None
-                    for x in range(len(GameBoard.States)):
-                        arr = GameBoard.QTable[x]
-                        exp = sum(arr) / len(arr)
-                        if biggest is None:
-                            biggest = exp
-                            i = x
-                        elif biggest < exp and player_role == Role.government:
-                            biggest = exp
-                            i = x
-                        elif biggest > exp and player_role != Role.government:
-                            biggest = exp
-                            i = x
-                    state = GameBoard.QTable[i]
-                b = 0
-                j = 0
-                ind = 0
-                for v in state:
-                    if v > b and player_role == Role.government:
-                        b = v
-                        ind = j
-                    elif v < b and player_role != Role.government:
-                        b = v
-                        ind = j
-                    j += 1
-                action_to_take = ACTION_SPACE[ind]
-                old_qval = b
-                old_state = i
+            print("stopping")
 
-                # Update
-                # Q(S, A) = Q(S, A) + alpha[R + gamma * max_a Q(S', A) - Q(S, A)]
-                reward = GameBoard.act(old_state, action_to_take)
-                ns = reward[1]
-                NewStateAct = GameBoard.QGreedyat(ns)
-                NS = GameBoard.QTable[ns][NewStateAct[0]]
-                # GameBoard.QTable[i] = GameBoard.QTable[i] + alpha * (reward[0] + gamma * NS) - GameBoard.QTable[i]
-                if GameBoard.num_zombies() == 0:
-                    print("winCase")
+        # Update the display
+        pygame.display.update()
+        pygame.time.wait(75)
 
-                take_action = []
-                print("Enemy turn")
-                ta = ""
-                if player_role == Role.government:
+    else:
+        if epochs_ran % 100 == 0:
+            print("Board Reset!")
+            GameBoard = Original_Board  # reset environment
+        for event in P:
+            i = 0
+            r = rd.uniform(0.0, 1.0)
+            st = rd.randint(0, len(GameBoard.States) - 1)
+            state = GameBoard.QTable[st]
+
+            if r < gamma:
+                while GameBoard.States[st].person is None:
+                    st = rd.randint(0, len(GameBoard.States) - 1)
+            else:
+                biggest = None
+                for x in range(len(GameBoard.States)):
+                    arr = GameBoard.QTable[x]
+                    exp = sum(arr) / len(arr)
+                    if biggest is None:
+                        biggest = exp
+                        i = x
+                    elif biggest < exp and player_role == Role.government:
+                        biggest = exp
+                        i = x
+                    elif biggest > exp and player_role != Role.government:
+                        biggest = exp
+                        i = x
+                state = GameBoard.QTable[i]
+            b = 0
+            j = 0
+            ind = 0
+            for v in state:
+                if v > b and player_role == Role.government:
+                    b = v
+                    ind = j
+                elif v < b and player_role != Role.government:
+                    b = v
+                    ind = j
+                j += 1
+            action_to_take = ACTION_SPACE[ind]
+            old_qval = b
+            old_state = i
+
+            # Update
+            # Q(S, A) = Q(S, A) + alpha[R + gamma * max_a Q(S', A) - Q(S, A)]
+            reward = GameBoard.act(old_state, action_to_take)
+            ns = reward[1]
+            NewStateAct = GameBoard.QGreedyat(ns)
+            NS = GameBoard.QTable[ns][NewStateAct[0]]
+            # GameBoard.QTable[i] = GameBoard.QTable[i] + alpha * (reward[0] + gamma * NS) - GameBoard.QTable[i]
+            if GameBoard.num_zombies() == 0:
+                print("winCase")
+
+            take_action = []
+            print("Enemy turn")
+            ta = ""
+            if player_role == Role.government:
+                r = rd.randint(0, 5)
+                while r == 4:
+
                     r = rd.randint(0, 5)
                     while r == 4:
                         r = rd.randint(0, 5)

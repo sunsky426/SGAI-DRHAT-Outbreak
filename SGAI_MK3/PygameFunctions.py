@@ -3,11 +3,13 @@ import pygame
 from Constants import *
 from Board import Board
 
+
 # constants
 BACKGROUND = "#DDC2A1"
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 CELL_COLOR = (233, 222, 188)
+SAFE_COLOR = (93, 138, 168)
 LINE_WIDTH = 5
 IMAGE_ASSETS = [
     "person_normal.png",
@@ -74,6 +76,7 @@ def run(GameBoard: Board):
     """
     screen.fill(BACKGROUND)
     build_grid(GameBoard)  # Draw the grid
+    
     # Draw the heal icon
     if GameBoard.player_role == Role.government:
         display_image(screen, "Assets/cure.jpeg", GameBoard.display_cell_dimensions, (950, 200))
@@ -85,6 +88,7 @@ def run(GameBoard: Board):
     display_reset_move_button()
     
     return pygame.event.get()
+
 
 def disp_title_screen():
     """
@@ -111,6 +115,22 @@ def disp_title_screen():
                         pygame.display.quit()
                         break
         pygame.display.update()
+
+def display_safe_space(GameBoard):
+    """
+    Creates a blue rectangle at every safe space state
+    """
+    for state in GameBoard.States:
+        if state.safeSpace:
+            coords = (
+                int(GameBoard.toCoord(state.location)[0]) * GameBoard.display_cell_dimensions[0]
+                + GameBoard.display_border,
+                int(GameBoard.toCoord(state.location)[1]) * GameBoard.display_cell_dimensions[1]
+                + GameBoard.display_border,
+            )
+            #draw a rectangle of dimensions 100x100 at the coordinates created above
+            pygame.draw.rect(screen, SAFE_COLOR, pygame.Rect(coords[0], coords[1], 100, 100))
+
 
 def display_reset_move_button():
     rect = pygame.Rect(
@@ -141,6 +161,7 @@ def build_grid(GameBoard: Board):
     """
     Draw the grid on the screen.
     """
+
     grid_width = GameBoard.columns * GameBoard.display_cell_dimensions[0]
     grid_height = GameBoard.rows * GameBoard.display_cell_dimensions[1]
     # left
@@ -193,7 +214,8 @@ def build_grid(GameBoard: Board):
         CELL_COLOR,
         [GameBoard.display_border, GameBoard.display_border, grid_width, grid_height],
     )
-
+    #Draw the safe space so that it is under the lines
+    display_safe_space(GameBoard)
     # Draw the vertical lines
     i = GameBoard.display_border + GameBoard.display_cell_dimensions[0]
     while i < GameBoard.display_border + grid_width:
@@ -237,6 +259,10 @@ def display_win_screen():
     screen.fill(BACKGROUND)
     screen.blit(
         font.render("You win!", True, WHITE),
+        (500, 350),
+    )
+    screen.blit(
+        font.render("There were no possible moves for the computer.", True, WHITE),
         (500, 400),
     )
     pygame.display.update()
@@ -252,6 +278,10 @@ def display_lose_screen():
     screen.fill(BACKGROUND)
     screen.blit(
         font.render("You lose!", True, WHITE),
+        (500, 350),
+    )
+    screen.blit(
+        font.render("You had no possible moves...", True, WHITE),
         (500, 400),
     )
     pygame.display.update()

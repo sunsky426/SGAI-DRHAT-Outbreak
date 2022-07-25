@@ -190,6 +190,11 @@ class Board:
         # Check if the new coordinates are valid
         if not self.isValidCoordinate(new_coords):
             return [False, destination_idx]
+        if(
+            self.player_role == Role.zombie
+            and self.States[destination_idx].safeSpace
+        ):
+            return [False, destination_idx]
 
         # Check if the destination is currently occupied
         if self.States[destination_idx].person is None:
@@ -277,6 +282,7 @@ class Board:
         if (
             self.States[target_idx].person is None
             or self.States[target_idx].person.isZombie
+            or self.States[target_idx].safeSpace
         ):
             return [False, target_idx]
         
@@ -345,6 +351,7 @@ class Board:
 
     def kill(self, coords: Tuple[int, int], direction: Direction) -> Tuple[bool, int]:
         target_coords = self.getTargetCoords(coords, direction)
+        if not self.isValidCoordinate(target_coords): return (False, target_coords)
         
         # Get the start and destination index (1D)
         start_idx = self.toIndex(coords)
@@ -425,7 +432,17 @@ class Board:
                 self.States[allppl[person]].person.isZombie = True
 
         #add two safe spaces
-        allsafes = rd.sample(range(len(self.States)), rd.randint(1, (self.rows*self.columns)//15))
-        for space in range(len(self.States)):
-            if state in allppl:
-                self.States[state].safeSpace = True
+        noZombieInSafe = False
+        while not noZombieInSafe:
+            allsafes = rd.sample(range(len(self.States)), rd.randint(1, (self.rows*self.columns)//15))
+            for state in range(len(self.States)):
+                if (
+                    self.States[state].person is not None
+                    and self.States[state].person.isZombie
+                ):
+                    continue
+                else:
+                    noZombieInSafe = True
+
+                if state in allsafes:
+                    self.States[state].safeSpace = True

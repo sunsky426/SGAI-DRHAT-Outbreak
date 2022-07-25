@@ -8,6 +8,7 @@ class Person:
         self.turnsVaccinated = 0
         self.isVaccinated = False
         self.wasCured = False
+        self.hasMed = False
 
     def clone(self):
         ret = Person(self.isZombie)
