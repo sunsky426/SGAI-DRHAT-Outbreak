@@ -148,6 +148,7 @@ while running:
 
         # Update the display
         pygame.display.update()
+        pygame.time.wait(75)
 
     else:
         if epochs_ran % 100 == 0:
