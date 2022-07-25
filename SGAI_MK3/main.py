@@ -112,7 +112,7 @@ while running:
                     take_action = []
             #Display the player's current score
             PF.screen.blit(font.render("Score: " + str(player_score), True, PF.WHITE),(900,500))
-            
+
             if playerMoved:
                 # Intermission
                 PF.run(GameBoard)
@@ -152,7 +152,7 @@ while running:
                     and len(possible_direction) == 0
                     and len(possible_move_coords) == 0
                 ):
-                    PF.display_win_screen()
+                    PF.display_win_screen(player_score)
                     running = False
                     continue
 

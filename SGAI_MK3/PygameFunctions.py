@@ -255,7 +255,7 @@ def display_people(GameBoard: Board):
             display_image(screen, char, (35, 60), coords)
 
 
-def display_win_screen():
+def display_win_screen(score):
     screen.fill(BACKGROUND)
     screen.blit(
         font.render("You win!", True, WHITE),
@@ -264,6 +264,10 @@ def display_win_screen():
     screen.blit(
         font.render("There were no possible moves for the computer.", True, WHITE),
         (500, 400),
+    )
+    screen.blit(
+        font.render("Your score was: " + str(score), True, WHITE),
+        (500, 450),
     )
     pygame.display.update()
 
