@@ -156,7 +156,7 @@ while running:
 
                 # Implement the selected action
                 print("action chosen is", action)
-                print("move start coord is", move_coord)
+                print("start coord is", move_coord)
                 print(GameBoard.actionToFunction[action](move_coord, direction, computer_role))
                 print("stopping")
 
