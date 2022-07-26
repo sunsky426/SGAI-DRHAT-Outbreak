@@ -1,6 +1,6 @@
 from typing import Tuple
 import pygame
-from Constants import *
+from constants import *
 from Board import Board
 
 
