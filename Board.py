@@ -449,7 +449,7 @@ class Board:
 
         #add one or boardSize/15 safe spaces
         allsafes = []
-        for space in range(2):#rd.randint(1, (self.rows*self.columns)//15)):
+        for space in range(rd.randint(1, (self.rows*self.columns)//15)):
             print("hi")
             print(allsafes)
             allsafes.append(rd.randint(0, len(self.States)))
