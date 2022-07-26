@@ -1,13 +1,17 @@
 import random as rd
 
+from Constants import Direction
+
 
 class Person:
     def __init__(self, iz: bool):
+        self.facing = Direction.up
         self.isZombie = iz
         self.wasVaccinated = False
         self.turnsVaccinated = 0
         self.isVaccinated = False
         self.wasCured = False
+        self.hasMed = False
 
     def clone(self):
         ret = Person(self.isZombie)

@@ -9,12 +9,8 @@ BACKGROUND = "#DDC2A1"
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 CELL_COLOR = (233, 222, 188)
+SAFE_COLOR = (93, 138, 168)
 LINE_WIDTH = 5
-IMAGE_ASSETS = [
-    "person_normal.png",
-    "person_vax.png",
-    "person_zombie.png",
-]
 GAME_WINDOW_DIMENSIONS = (1200, 800)
 RESET_MOVE_COORDS = (800, 600)
 RESET_MOVE_DIMS = (200, 50)
@@ -75,6 +71,7 @@ def run(GameBoard: Board):
     """
     screen.fill(BACKGROUND)
     build_grid(GameBoard)  # Draw the grid
+    
     # Draw the heal icon
     if GameBoard.player_role == Role.government:
         display_image(screen, "Assets/cure.jpeg", GameBoard.display_cell_dimensions, (950, 200))
@@ -84,7 +81,50 @@ def run(GameBoard: Board):
     #Draw the kill button slightly to the left of heal
     display_people(GameBoard)
     display_reset_move_button()
+    
     return pygame.event.get()
+
+
+def disp_title_screen():
+    """
+    Displays a basic title screen with title, start button, and quit button
+    """
+    start_text = font.render('START', True, WHITE)
+    quit_text = font.render('QUIT', True, WHITE)
+    screen.fill(BACKGROUND)
+    #Draw title
+    display_image(screen, "Assets/Outbreak_title.png", (1048, 238), (76, 100))
+    #Check if the user has clicked either start or quit
+    while True:
+        mouse = pygame.mouse.get_pos()
+        #Draw the start and quit buttons (They might need a little bit more work at some point, they're not centered well)
+        pygame.draw.rect(screen,BLACK,[500,350,200,100])
+        pygame.draw.rect(screen,BLACK,[500,500,200,100])
+        screen.blit(start_text, (560, 375))
+        screen.blit(quit_text, (570, 525))
+        for i in pygame.event.get():
+            if i.type == pygame.MOUSEBUTTONDOWN:
+                if 500 <= mouse[0] <= 700 and 350 <= mouse[1] <= 450:
+                    return True
+                elif 500 <= mouse[0] <= 700 and 500 <= mouse[1] <= 600:
+                        pygame.display.quit()
+                        break
+        pygame.display.update()
+
+def display_safe_space(GameBoard):
+    """
+    Creates a blue rectangle at every safe space state
+    """
+    for state in GameBoard.States:
+        if state.safeSpace:
+            coords = (
+                int(GameBoard.toCoord(state.location)[0]) * GameBoard.display_cell_dimensions[0]
+                + GameBoard.display_border,
+                int(GameBoard.toCoord(state.location)[1]) * GameBoard.display_cell_dimensions[1]
+                + GameBoard.display_border,
+            )
+            #draw a rectangle of dimensions 100x100 at the coordinates created above
+            pygame.draw.rect(screen, SAFE_COLOR, pygame.Rect(coords[0], coords[1], 100, 100))
 
 
 def display_reset_move_button():
@@ -116,6 +156,7 @@ def build_grid(GameBoard: Board):
     """
     Draw the grid on the screen.
     """
+
     grid_width = GameBoard.columns * GameBoard.display_cell_dimensions[0]
     grid_height = GameBoard.rows * GameBoard.display_cell_dimensions[1]
     # left
@@ -168,7 +209,8 @@ def build_grid(GameBoard: Board):
         CELL_COLOR,
         [GameBoard.display_border, GameBoard.display_border, grid_width, grid_height],
     )
-
+    #Draw the safe space so that it is under the lines
+    display_safe_space(GameBoard)
     # Draw the vertical lines
     i = GameBoard.display_border + GameBoard.display_cell_dimensions[0]
     while i < GameBoard.display_border + grid_width:
@@ -192,11 +234,11 @@ def display_people(GameBoard: Board):
     for x in range(len(GameBoard.States)):
         if GameBoard.States[x].person != None:
             p = GameBoard.States[x].person
-            char = "Assets/" + IMAGE_ASSETS[0]
-            if p.isVaccinated:
-                char = "Assets/" + IMAGE_ASSETS[1]
-            elif p.isZombie:
-                char = "Assets/" + IMAGE_ASSETS[2]
+            char = "Assets/person_normal.png"
+            if p.isZombie:
+                char = "Assets/person_zombie.png"
+            elif p.isVaccinated:
+                char = "Assets/person_vax.png"
             coords = (
                 int(x % GameBoard.rows) * GameBoard.display_cell_dimensions[0]
                 + GameBoard.display_border
@@ -207,14 +249,34 @@ def display_people(GameBoard: Board):
             )
             display_image(screen, char, (35, 60), coords)
 
-
+#Creates buttons that allow the player to quit or restart
 def display_win_screen():
+    restart_text = font.render('PLAY AGAIN', True, WHITE)
+    quit_text = font.render('QUIT', True, WHITE)
     screen.fill(BACKGROUND)
     screen.blit(
         font.render("You win!", True, WHITE),
+        (500, 350),
+    )
+    screen.blit(
+        font.render("There were no possible moves for the computer.", True, WHITE),
         (500, 400),
     )
-    pygame.display.update()
+    
+    while True:
+        mouse = pygame.mouse.get_pos()
+        pygame.draw.rect(screen,BLACK,[500,450,200,100])
+        pygame.draw.rect(screen,BLACK,[500,600,200,100])
+        screen.blit(restart_text, (550, 475))
+        screen.blit(quit_text, (570, 625))
+        for i in pygame.event.get():
+            if i.type == pygame.MOUSEBUTTONDOWN:
+                if 500 <= mouse[0] <= 700 and 450 <= mouse[1] <= 550:
+                    return True
+                elif 500 <= mouse[0] <= 700 and 600 <= mouse[1] <= 700:
+                        return False
+                        break
+        pygame.display.update()
 
     # catch quit event
     while True:
@@ -222,14 +284,35 @@ def display_win_screen():
             if event.type == pygame.QUIT:
                 return
 
-
+#similar code, just for a loss case
 def display_lose_screen():
+    restart_text = font.render('PLAY AGAIN', True, WHITE)
+    quit_text = font.render('QUIT', True, WHITE)
+
     screen.fill(BACKGROUND)
     screen.blit(
         font.render("You lose!", True, WHITE),
+        (500, 350),
+    )
+    screen.blit(
+        font.render("You had no possible moves...", True, WHITE),
         (500, 400),
     )
-    pygame.display.update()
+
+    while True:
+        mouse = pygame.mouse.get_pos()
+        pygame.draw.rect(screen,BLACK,[500,450,200,100])
+        pygame.draw.rect(screen,BLACK,[500,600,200,100])
+        screen.blit(restart_text, (550, 475))
+        screen.blit(quit_text, (570, 625))
+        for i in pygame.event.get():
+            if i.type == pygame.MOUSEBUTTONDOWN:
+                if 500 <= mouse[0] <= 700 and 450 <= mouse[1] <= 550:
+                    return True
+                elif 500 <= mouse[0] <= 700 and 600 <= mouse[1] <= 700:
+                        return False
+                        break
+        pygame.display.update()
 
     # catch quit event
     while True:
@@ -238,7 +321,9 @@ def display_lose_screen():
                 return
 
 def direction(coord1: Tuple[int, int], coord2: Tuple[int, int]):    
-    if coord2[1] > coord1[1]:
+    if coord1 == coord2:
+        return Direction.self
+    elif coord2[1] > coord1[1]:
         return Direction.down
     elif coord2[1] < coord1[1]:
         return Direction.up
