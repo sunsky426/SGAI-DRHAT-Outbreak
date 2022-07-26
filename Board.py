@@ -17,6 +17,9 @@ class Board:
         cell_dimensions: Tuple[int, int],
         player_role: Role,
     ):
+        self.outrage = 0
+        self.anxiety = 0
+
         self.rows = dimensions[0]
         self.columns = dimensions[1]
         self.display_border = border
@@ -394,6 +397,7 @@ class Board:
 
         # Execute Kill
         self.States[target_idx].person = None
+        self.outrage += 0.4 * (100 - self.anxiety)
         KILL_SOUND.play()
         return [True, target_idx]
 
