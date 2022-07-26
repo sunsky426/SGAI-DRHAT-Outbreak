@@ -2,7 +2,7 @@ from State import State
 import random as rd
 from Person import Person
 from typing import List, Tuple
-from constants import *
+from Constants import *
 import pygame
 import os
 pygame.mixer.init()
