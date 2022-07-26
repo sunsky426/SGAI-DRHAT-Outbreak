@@ -30,3 +30,8 @@ reverse_dir = {
     Direction.left: Direction.right,
     Direction.right: Direction.left
 }
+
+class Result(enum.Enum):
+    invalid = 0
+    success = 1
+    failure = 2
