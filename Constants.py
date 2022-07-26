@@ -24,6 +24,7 @@ class Role(enum.Enum):
     zombie = 1
 
 reverse_dir = {
+    Direction.self: Direction.self,
     Direction.up: Direction.down,
     Direction.down: Direction.up,
     Direction.left: Direction.right,
