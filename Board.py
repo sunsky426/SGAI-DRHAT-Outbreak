@@ -450,8 +450,6 @@ class Board:
         #add one or boardSize/15 safe spaces
         allsafes = []
         for space in range(rd.randint(1, (self.rows*self.columns)//15)):
-            print("hi")
-            print(allsafes)
             allsafes.append(rd.randint(0, len(self.States)))
             while allsafes[-1] in allsafes[0:-1] or allsafes[-1] in allppl:
                 allsafes.remove(allsafes[-1])
