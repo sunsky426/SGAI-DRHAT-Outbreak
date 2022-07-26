@@ -56,8 +56,8 @@ while running:
                     x, y = pygame.mouse.get_pos()
                     action = PF.get_action(GameBoard, x, y)
 
-                    if(action == Action.med):
-                        take_action.append(Action.med)
+                    if(action == "Distrb Med"):
+                        take_action.append("Distrb Med")
                         time.sleep(0.1)
                         GameBoard.med()
                         take_action = []

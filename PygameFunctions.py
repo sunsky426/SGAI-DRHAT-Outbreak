@@ -58,7 +58,7 @@ def get_action(GameBoard: Board, pixel_x: int, pixel_y: int):
         else:
             return Action.bite
     elif Med_check:
-        return Action.med
+        return "Distrb Med"
     elif kill_check:
         return Action.kill
     elif reset_move_check:
