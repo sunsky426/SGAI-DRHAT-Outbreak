@@ -458,7 +458,7 @@ class Board:
                 self.population += 1
                 
         #turn half the humans into zombies
-        allzombs = rd.sample(range(len(allppl)), len(allppl)//3)
+        allzombs = rd.sample(range(len(allppl)), len(allppl)//4)
         for person in allzombs:
             self.States[allppl[person]].person.isZombie = True
 
