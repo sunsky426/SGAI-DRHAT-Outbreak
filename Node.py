@@ -14,6 +14,10 @@ class Node:
         self.results[-1] = 0  # idk what those three lines do...
         self.untried_actions = None
         self.untried_actions = self.untried_actions()
+        self.gameRunning = True
         return
+
+    def game_ended(self):
+        self.gameRunning = False
 
 
