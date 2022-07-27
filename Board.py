@@ -354,6 +354,7 @@ class Board:
         #probability of heal vs failed heal
         if self.States[target_idx].person.isZombie:
             chance = 50
+            self.anxiety -= 6
         else:
             chance = 100
         
@@ -367,7 +368,7 @@ class Board:
             newTarget.turnsVaccinated = 1
             self.States[target_idx].person = newTarget
 
-            self.anxiety -= 10
+            self.anxiety -= 3
         else:
             #implement failed heal
             self.bite(target_coords, reverse_dir[direction], role)
@@ -403,7 +404,7 @@ class Board:
         self.States[target_idx].person = None
         KILL_SOUND.play()
 
-        self.outrage += 40 * (1 - tanh(self.anxiety / 50))
+        self.outrage += 40 * (1 - smoothstep(0, 100, self.anxiety))
 
         return [True, target_idx]
 
@@ -457,7 +458,7 @@ class Board:
                 self.population += 1
                 
         #turn half the humans into zombies
-        allzombs = rd.sample(range(len(allppl)), len(allppl)//2)
+        allzombs = rd.sample(range(len(allppl)), len(allppl)//3)
         for person in allzombs:
             self.States[allppl[person]].person.isZombie = True
 
