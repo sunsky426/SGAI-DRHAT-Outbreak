@@ -2,6 +2,7 @@ from typing import Tuple
 import pygame
 from constants import *
 from Board import Board
+from math import tanh
 
 
 # constants
@@ -85,7 +86,8 @@ def run(GameBoard: Board):
     #Draw the kill button slightly to the left of heal
     display_people(GameBoard)
     display_reset_move_button()
-    
+    screen.blit(font.render(f"public outrage: {int(GameBoard.outrage)} %", True, WHITE), (10, 10))
+    screen.blit(font.render(f"public anxiety: {int(GameBoard.anxiety)} %", True, WHITE), (10, 40))
     return pygame.event.get()
 
 
