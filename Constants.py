@@ -34,15 +34,3 @@ reverse_dir = {
     Direction.left: Direction.right,
     Direction.right: Direction.left
 }
-
-def smoothstep (x):
-   if (x < 0):
-      return 0
-
-   if (x >= 100):
-      return 1
-
-   # Scale/bias into [0..1] range
-   x = x / 100
-
-   return x
