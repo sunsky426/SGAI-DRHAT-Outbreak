@@ -1,4 +1,3 @@
-from multiprocessing.reduction import steal_handle
 from State import State
 import random as rd
 from Person import Person
