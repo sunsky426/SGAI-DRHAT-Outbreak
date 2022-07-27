@@ -112,13 +112,12 @@ while running:
                     print("Implementing", take_action[0], "to", directionToMove)
                     result = GameBoard.actionToFunction[take_action[0]](take_action[1], directionToMove)
                     print(f"did it succeed? {result}")
-                    if result != Result.invalid:
-                        playerMoved = True
-                    elif result == Result.success:
-                        print(player_score)
+
+                    if result == Result.success:
                         player_score += PF.get_reward(take_action[0])
-                        PF.screen.blit(font.render("Score: " + str(player_score), True, PF.WHITE),(900,500))
                         #if it succeeds, the player gets a reward corresponding to their action
+                    elif result != Result.invalid:
+                        playerMoved = True
                     take_action = []
             #Display the player's current score
             PF.screen.blit(font.render("Score: " + str(player_score), True, PF.WHITE),(900,500))
