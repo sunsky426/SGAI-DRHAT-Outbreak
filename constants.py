@@ -28,6 +28,11 @@ class Role(enum.Enum):
     government = 0
     zombie = 1
 
+class Result(enum.Enum):
+    invalid = 0
+    success = 1
+    failure = 2
+
 reverse_dir = {
     Direction.up: Direction.down,
     Direction.down: Direction.up,
