@@ -118,7 +118,8 @@ while running:
                     if result == Result.success:
                         player_score += PF.get_reward(take_action[0])
                         #if it succeeds, the player gets a reward corresponding to their action
-                    elif result != Result.invalid:
+                    
+                    if result != Result.invalid:
                         playerMoved = True
                     take_action = []
             #Display the player's current score
