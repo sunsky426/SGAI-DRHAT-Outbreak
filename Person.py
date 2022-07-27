@@ -1,6 +1,6 @@
 import random as rd
 
-from Constants import Direction
+from constants import Direction
 
 
 class Person:
