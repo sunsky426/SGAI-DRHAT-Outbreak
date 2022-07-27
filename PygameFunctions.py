@@ -328,6 +328,17 @@ def display_lose_screen():
             if event.type == pygame.QUIT:
                 return
 
+#gets the reward for a certain action
+def get_reward(action):
+    if action == Action.move:
+        return 10
+    elif action == Action.heal:
+        return 1000
+    elif action == Action.kill:
+        return 100
+    elif action == Action.bite:
+        return -100
+
 def direction(coord1: Tuple[int, int], coord2: Tuple[int, int]):    
     if coord1 == coord2:
         return Direction.self

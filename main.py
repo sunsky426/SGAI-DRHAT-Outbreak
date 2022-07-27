@@ -29,6 +29,10 @@ playerMoved = False
 font = pygame.font.SysFont("Comic Sans", 20)
 start = False
 
+#Initial player score
+player_score = 0
+
+
 while running:
     #displays the main menu until user hits start or quit
     if start == False:
@@ -102,15 +106,23 @@ while running:
             )
             PF.screen.blit(font.render(f"{take_action}", True, PF.WHITE), (800, 450))
 
+            
+
             # Action handling
             if len(take_action) > 2:
                     directionToMove = PF.direction(take_action[1], take_action[2])
                     print("Implementing", take_action[0], "to", directionToMove)
-                    result = GameBoard.actionToFunction[take_action[0]](take_action[1], directionToMove, player_role)
-                    print(f"did it succeed? {result[0]}")
-                    if result[0] is not False:
+                    result = GameBoard.actionToFunction[take_action[0]](take_action[1], directionToMove)
+                    print(f"did it succeed? {result}")
+
+                    if result == Result.success:
+                        player_score += PF.get_reward(take_action[0])
+                        #if it succeeds, the player gets a reward corresponding to their action
+                    elif result != Result.invalid:
                         playerMoved = True
                     take_action = []
+            #Display the player's current score
+            PF.screen.blit(font.render("Score: " + str(player_score), True, PF.WHITE),(900,500))
 
             if playerMoved:
                 # Intermission
@@ -165,8 +177,8 @@ while running:
 
                 # Implement the selected action
                 print("action chosen is", action)
-                print("start coord is", move_coord)
-                print(GameBoard.actionToFunction[action](move_coord, direction, computer_role))
+                print("move start coord is", move_coord)
+                print(GameBoard.actionToFunction[action](move_coord, direction))
                 print("stopping")
 
         # Update the display
