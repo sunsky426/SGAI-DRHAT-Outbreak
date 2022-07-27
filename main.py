@@ -3,7 +3,7 @@ import pygame
 from Board import Board
 import PygameFunctions as PF
 import random as rd
-from Constants import *
+from constants import *
 import time
 
 # Player role variables
