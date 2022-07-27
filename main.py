@@ -1,4 +1,3 @@
-from telnetlib import GA
 import pygame
 from Board import Board
 import PygameFunctions as PF
@@ -59,7 +58,13 @@ while running:
                     x, y = pygame.mouse.get_pos()
                     action = PF.get_action(GameBoard, x, y)
 
-                    if(
+                    if(action == "Distrb Med"):
+                        take_action.append("Distrb Med")
+                        time.sleep(0.1)
+                        GameBoard.med()
+                        take_action = []
+                    
+                    elif(
                         type(action) == Action
                         and len(take_action) == 0
                     ):

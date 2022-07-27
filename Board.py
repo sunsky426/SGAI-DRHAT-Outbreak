@@ -1,3 +1,4 @@
+from multiprocessing.reduction import steal_handle
 from State import State
 import random as rd
 from Person import Person
@@ -339,6 +340,7 @@ class Board:
         #check if the orgin is valid
         if (
             self.States[start_idx].person is None
+            or self.States[start_idx].person.hasMed == False
             or self.States[start_idx].person.isZombie
             or self.States[start_idx].safeSpace
         ):
@@ -358,6 +360,7 @@ class Board:
             chance = 100
         
         r = rd.randint(0, 100)
+        self.States[start_idx].person.hasMed = False
         if r < chance:
             #implement heal
             newTarget = self.States[target_idx].person.clone()
@@ -410,6 +413,16 @@ class Board:
         self.outrage += 50 * (1 - smoothstep(0, 100, self.anxiety))
 
         return [True, target_idx]
+
+    def med(self):
+        for idx in range(len(self.States)):
+                state = self.States[idx]
+                if(
+                    state.safeSpace == True
+                    and state.person is not None
+                ):
+                    state.person.hasMed = True
+                self.States[idx] = state
 
     #gets all the locations of people or zombies on the board (this can be used to count them as well)
     def get_possible_states(self, role_number: int):
