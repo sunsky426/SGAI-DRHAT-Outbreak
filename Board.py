@@ -354,7 +354,6 @@ class Board:
         #probability of heal vs failed heal
         if self.States[target_idx].person.isZombie:
             chance = 50
-            self.anxiety -= 6
         else:
             chance = 100
         
@@ -368,7 +367,11 @@ class Board:
             newTarget.turnsVaccinated = 1
             self.States[target_idx].person = newTarget
 
-            self.anxiety -= 3
+            if chance == 50:
+                self.anxiety -= 6
+            else:
+                self.anxiety -= 1
+            
         else:
             #implement failed heal
             self.bite(target_coords, reverse_dir[direction], role)
@@ -448,6 +451,9 @@ class Board:
 
     #adds the people into the grid
     def populate(self):
+
+        self.anxiety = 0
+        self.outrage = 0
 
         #make between 7 and boardsize/3 people
         allppl = rd.sample(range(len(self.States)), rd.randint(7, ((self.rows * self.columns) / 3)))

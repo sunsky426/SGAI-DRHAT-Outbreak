@@ -51,8 +51,6 @@ while running:
                     state.person = None
                     state.safeSpace = False
                 GameBoard.populate()
-                GameBoard.anxiety = 0
-                GameBoard.outrage = 0
                 start = False
                 continue
             # Event Handling

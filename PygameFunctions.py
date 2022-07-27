@@ -83,7 +83,7 @@ def run(GameBoard: Board):
     display_people(GameBoard)
     display_reset_move_button()
     screen.blit(font.render(f"public outrage: {int(GameBoard.outrage)} %", True, WHITE), (10, 10))
-    screen.blit(font.render(f"public anxiety: {int(100 * smoothstep(0, 100, GameBoard.anxiety))} %", True, WHITE), (10, 40))
+    screen.blit(font.render(f"public anxiety: {int(GameBoard.anxiety)} %", True, WHITE), (10, 40))
     return pygame.event.get()
 
 
