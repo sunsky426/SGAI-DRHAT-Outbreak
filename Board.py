@@ -1,10 +1,10 @@
-from multiprocessing.reduction import steal_handle
 from State import State
 import random as rd
 from Person import Person
 from typing import List, Tuple
 from constants import *
 import pygame
+from math import tanh
 import os
 pygame.mixer.init()
 
@@ -18,6 +18,9 @@ class Board:
         cell_dimensions: Tuple[int, int],
         player_role: Role,
     ):
+        self.outrage = 0
+        self.anxiety = 0
+
         self.rows = dimensions[0]
         self.columns = dimensions[1]
         self.display_border = border
@@ -317,6 +320,7 @@ class Board:
             newTarget.isZombie = True
             newTarget.isVaccinated = False
             self.States[target_idx].person = newTarget
+            self.anxiety += 10
         return [True, target_idx]
 
     def heal(self, coords: Tuple[int, int], direction: Direction, role: Role) -> Tuple[bool, int]:
@@ -364,6 +368,12 @@ class Board:
             newTarget.isVaccinated = True
             newTarget.turnsVaccinated = 1
             self.States[target_idx].person = newTarget
+
+            if chance == 50:
+                self.anxiety -= 6
+            else:
+                self.anxiety -= 1
+            
         else:
             #implement failed heal
             self.bite(target_coords, reverse_dir[direction], role)
@@ -398,6 +408,9 @@ class Board:
         # Execute Kill
         self.States[target_idx].person = None
         KILL_SOUND.play()
+
+        self.outrage += 0.5 * (100 - self.anxiety)
+
         return [True, target_idx]
 
     def med(self):
@@ -451,6 +464,9 @@ class Board:
     #adds the people into the grid
     def populate(self):
 
+        self.anxiety = 0
+        self.outrage = 0
+
         #make between 7 and boardsize/3 people
         allppl = rd.sample(range(len(self.States)), rd.randint(7, ((self.rows * self.columns) / 3)))
         for state in range(len(self.States)):
@@ -460,7 +476,7 @@ class Board:
                 self.population += 1
                 
         #turn half the humans into zombies
-        allzombs = rd.sample(range(len(allppl)), len(allppl)//2)
+        allzombs = rd.sample(range(len(allppl)), len(allppl)//4)
         for person in allzombs:
             self.States[allppl[person]].person.isZombie = True
 

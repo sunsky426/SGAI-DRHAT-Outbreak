@@ -1,4 +1,3 @@
-from numpy import take
 import pygame
 from Board import Board
 import PygameFunctions as PF
@@ -42,7 +41,10 @@ while running:
     elif start == True:
         P = PF.run(GameBoard)
         if SELF_PLAY:
-            if not GameBoard.containsPerson(bool(player_role.value)):
+            if(
+                not GameBoard.containsPerson(bool(player_role.value))
+                or GameBoard.outrage >= 100
+            ):
                 running = PF.display_lose_screen()
                 for state in GameBoard.States:
                     state.person = None
