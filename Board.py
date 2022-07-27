@@ -404,7 +404,7 @@ class Board:
         self.States[target_idx].person = None
         KILL_SOUND.play()
 
-        self.outrage += 40 * (1 - smoothstep(0, 100, self.anxiety))
+        self.outrage += 50 * (1 - smoothstep(0, 100, self.anxiety))
 
         return [True, target_idx]
 
