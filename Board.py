@@ -323,6 +323,10 @@ class Board:
             newTarget.isZombie = True
             newTarget.isVaccinated = False
             self.States[target_idx].person = newTarget
+            
+            #update public anxiety
+            self.anxiety += 10
+            
             return Result.success
         return Result.failure
 
