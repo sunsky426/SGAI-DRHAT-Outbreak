@@ -1,9 +1,9 @@
-from multiprocessing.reduction import steal_handle
+# from multiprocessing.reduction import steal_handle
 from State import State
 import random as rd
 from Person import Person
 from typing import List, Tuple
-from Constants import *
+from constants import *
 
 
 class Board:
