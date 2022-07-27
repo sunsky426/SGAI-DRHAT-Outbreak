@@ -1,9 +1,10 @@
-# from multiprocessing.reduction import steal_handle
 from State import State
 import random as rd
 from Person import Person
 from typing import List, Tuple
 from constants import *
+import pygame
+pygame.mixer.init()
 
 
 class Board:
@@ -15,6 +16,9 @@ class Board:
         cell_dimensions: Tuple[int, int],
         player_role: Role,
     ):
+        self.outrage = 0
+        self.anxiety = 0
+
         self.rows = dimensions[0]
         self.columns = dimensions[1]
         self.display_border = border
@@ -84,7 +88,7 @@ class Board:
 
                     if (
                         state.person.isZombie
-                        and B.actionToFunction[action](B.toCoord(state.location), direction, role)[0]
+                        and bool(B.actionToFunction[action](B.toCoord(state.location), direction).value)
                     ):
                         poss.append(B.toCoord(state.location))
                         changed_states = True
@@ -107,7 +111,7 @@ class Board:
                     changed_states = False
                     if (
                         not state.person.isZombie
-                        and B.actionToFunction[action](B.toCoord(state.location), direction)[0]
+                        and bool(B.actionToFunction[action](B.toCoord(state.location), direction).value)
                     ):
                         poss.append(B.toCoord(state.location))
                         changed_states = True
@@ -188,10 +192,10 @@ class Board:
 
         return new_coords
     
-    def move(self, coords: Tuple[int, int], direction: Direction, role: Role) -> Tuple[bool, int]:    
+    def move(self, coords: Tuple[int, int], direction: Direction) -> Result:
         new_coords = self.getTargetCoords(coords, direction)
-        if direction == Direction.self: return (False, new_coords)
-        if not self.isValidCoordinate(new_coords): return (False, new_coords)
+        if direction == Direction.self: return Result.invalid
+        if not self.isValidCoordinate(new_coords): return Result.invalid
         
         # Get the start and destination index (1D)
         start_idx = self.toIndex(coords)
@@ -199,20 +203,20 @@ class Board:
 
         # Check if the new coordinates are valid
         if not self.isValidCoordinate(new_coords):
-            return [False, destination_idx]
+            return Result.invalid
         if(
-            role == Role.zombie
+            self.States[start_idx].person.isZombie
             and self.States[destination_idx].safeSpace
         ):
-            return [False, destination_idx]
+            return Result.invalid
 
         # Check if the destination is currently occupied
         if self.States[destination_idx].person is None:
             #Execute Move
             self.States[destination_idx].person = self.States[start_idx].person
             self.States[start_idx].person = None
-            return [True, destination_idx]
-        return [False, destination_idx]
+            return Result.success
+        return Result.invalid
 
     def QGreedyat(self, state_id):
         biggest = self.QTable[state_id][0] * self.player_role
@@ -272,10 +276,10 @@ class Board:
                     d = rd.randint(0, len(self.States))
             return d
 
-    def bite(self, coords: Tuple[int, int], direction: Direction, role: Role) -> Tuple[bool, int]:
+    def bite(self, coords: Tuple[int, int], direction: Direction) -> Result:
         target_coords = self.getTargetCoords(coords, direction)
-        if direction == Direction.self: return (False, target_coords)
-        if not self.isValidCoordinate(target_coords): return (False, target_coords)
+        if direction == Direction.self: return Result.invalid
+        if not self.isValidCoordinate(target_coords): return Result.invalid
         
         # Get the start and destination index (1D)
         start_idx = self.toIndex(coords)
@@ -286,7 +290,12 @@ class Board:
             self.States[start_idx].person is None
             or not self.States[start_idx].person.isZombie
         ):
-            return[False, target_idx]
+            return Result.invalid
+        if(
+            self.States[start_idx].person.isZombie
+            and self.States[target_idx].safeSpace
+        ):
+            return Result.invalid
         
         
         # Check if the destination is valid
@@ -295,7 +304,7 @@ class Board:
             or self.States[target_idx].person.isZombie
             or self.States[target_idx].safeSpace
         ):
-            return [False, target_idx]
+            return Result.invalid
         
         #calculate probability
         chance = 100
@@ -314,16 +323,17 @@ class Board:
             newTarget.isZombie = True
             newTarget.isVaccinated = False
             self.States[target_idx].person = newTarget
-        return [True, target_idx]
+            return Result.success
+        return Result.failure
 
-    def heal(self, coords: Tuple[int, int], direction: Direction, role: Role) -> Tuple[bool, int]:
+    def heal(self, coords: Tuple[int, int], direction: Direction) -> Result:
         """
         the person at the stated coordinate heals the zombie to the person's stated direction
         If no person is selected, then return [False, None]
         if a person is vaccined, then return [True, index]
         """
         target_coords = self.getTargetCoords(coords, direction)
-        if not self.isValidCoordinate(target_coords): return (False, target_coords)
+        if not self.isValidCoordinate(target_coords): return Result.invalid
         
         # Get the start and destination index (1D)
         start_idx = self.toIndex(coords)
@@ -336,14 +346,14 @@ class Board:
             or self.States[start_idx].person.isZombie
             or self.States[start_idx].safeSpace
         ):
-            return[False, target_idx]
+            return Result.invalid
         
         
         # Check if the destination is valid
         if (
             self.States[target_idx].person is None
         ):
-            return [False, target_idx]
+            return Result.invalid
             
         #probability of heal vs failed heal
         if self.States[target_idx].person.isZombie:
@@ -352,6 +362,7 @@ class Board:
             chance = 100
         
         r = rd.randint(0, 100)
+        self.States[start_idx].person.hasMed = False
         if r < chance:
             #implement heal
             newTarget = self.States[target_idx].person.clone()
@@ -360,18 +371,22 @@ class Board:
             newTarget.isVaccinated = True
             newTarget.turnsVaccinated = 1
             self.States[target_idx].person = newTarget
+
+            if chance == 50:
+                self.anxiety -= 6
+            else:
+                self.anxiety -= 1
+            
         else:
             #implement failed heal
-            self.bite(target_coords, reverse_dir[direction], role)
-        
-        self.States[start_idx].person.hasMed = False
+            self.bite(target_coords, reverse_dir[direction])
+            return Result.failure
+        return Result.success
 
-        return [True, target_idx]
-
-    def kill(self, coords: Tuple[int, int], direction: Direction, role: Role) -> Tuple[bool, int]:
+    def kill(self, coords: Tuple[int, int], direction: Direction) -> Result:
         target_coords = self.getTargetCoords(coords, direction)
-        if direction == Direction.self: return (False, target_coords)
-        if not self.isValidCoordinate(target_coords): return (False, target_coords)
+        if direction == Direction.self: return Result.invalid
+        if not self.isValidCoordinate(target_coords): return Result.invalid
         
         # Get the start and destination index (1D)
         start_idx = self.toIndex(coords)
@@ -383,7 +398,7 @@ class Board:
             or self.States[start_idx].person.isZombie
             or self.States[start_idx].safeSpace
         ):
-            return[False, target_idx]
+            return Result.invalid
         
         
         # Check if the destination is valid
@@ -391,11 +406,14 @@ class Board:
             self.States[target_idx].person is None
             or not self.States[target_idx].person.isZombie
         ):
-            return [False, target_idx]
+            return Result.invalid
 
         # Execute Kill
         self.States[target_idx].person = None
-        return [True, target_idx]
+        KILL_SOUND.play()
+        self.outrage += 0.5 * (100 - self.anxiety)
+        
+        return Result.success
 
     def med(self):
         for idx in range(len(self.States)):
@@ -448,6 +466,9 @@ class Board:
     #adds the people into the grid
     def populate(self):
 
+        self.anxiety = 0
+        self.outrage = 0
+
         #make between 7 and boardsize/3 people
         allppl = rd.sample(range(len(self.States)), rd.randint(7, ((self.rows * self.columns) / 3)))
         for state in range(len(self.States)):
@@ -457,10 +478,9 @@ class Board:
                 self.population += 1
                 
         #turn half the humans into zombies
-        allzombs = rd.sample(range(len(allppl)), len(allppl)//2)
-        for person in range(len(allppl)):
-            if person in allzombs:
-                self.States[allppl[person]].person.isZombie = True
+        allzombs = rd.sample(range(len(allppl)), len(allppl)//4)
+        for person in allzombs:
+            self.States[allppl[person]].person.isZombie = True
 
         #add two safe spaces
         noZombieInSafe = False
