@@ -1,4 +1,4 @@
-# from multiprocessing.reduction import steal_handle
+
 from State import State
 import random as rd
 from Person import Person
@@ -352,6 +352,7 @@ class Board:
             chance = 100
         
         r = rd.randint(0, 100)
+        self.States[start_idx].person.hasMed = False
         if r < chance:
             #implement heal
             newTarget = self.States[target_idx].person.clone()
