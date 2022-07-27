@@ -1,8 +1,11 @@
+from multiprocessing.reduction import steal_handle
 from State import State
 import random as rd
 from Person import Person
 from typing import List, Tuple
 from constants import *
+import pygame
+pygame.mixer.init()
 
 
 class Board:
@@ -337,6 +340,7 @@ class Board:
         #check if the orgin is valid
         if (
             self.States[start_idx].person is None
+            or self.States[start_idx].person.hasMed == False
             or self.States[start_idx].person.isZombie
             or self.States[start_idx].safeSpace
         ):
@@ -356,6 +360,7 @@ class Board:
             chance = 100
         
         r = rd.randint(0, 100)
+        self.States[start_idx].person.hasMed = False
         if r < chance:
             #implement heal
             newTarget = self.States[target_idx].person.clone()
@@ -397,7 +402,18 @@ class Board:
 
         # Execute Kill
         self.States[target_idx].person = None
+        KILL_SOUND.play()
         return Result.success
+
+    def med(self):
+        for idx in range(len(self.States)):
+                state = self.States[idx]
+                if(
+                    state.safeSpace == True
+                    and state.person is not None
+                ):
+                    state.person.hasMed = True
+                self.States[idx] = state
 
     #gets all the locations of people or zombies on the board (this can be used to count them as well)
     def get_possible_states(self, role_number: int):
@@ -450,22 +466,18 @@ class Board:
                 
         #turn half the humans into zombies
         allzombs = rd.sample(range(len(allppl)), len(allppl)//2)
-        for person in range(len(allppl)):
-            if person in allzombs:
-                self.States[allppl[person]].person.isZombie = True
+        for person in allzombs:
+            self.States[allppl[person]].person.isZombie = True
 
-        #add two safe spaces
-        noZombieInSafe = False
-        while not noZombieInSafe:
-            allsafes = rd.sample(range(len(self.States)), rd.randint(1, (self.rows*self.columns)//15))
-            for state in range(len(self.States)):
-                if (
-                    self.States[state].person is not None
-                    and self.States[state].person.isZombie
-                ):
-                    continue
-                else:
-                    noZombieInSafe = True
+        #add one or boardSize/15 safe spaces
+        allsafes = []
+        for space in range(rd.randint(1, (self.rows*self.columns)//15)):
+            allsafes.append(rd.randint(0, len(self.States)))
+            while allsafes[-1] in allsafes[0:-1] or allsafes[-1] in allppl:
+                allsafes.remove(allsafes[-1])
+                allsafes.append(rd.randint(0, len(self.States)))
 
-                if state in allsafes:
-                    self.States[state].safeSpace = True
+        
+        for safe in allsafes:    
+            self.States[safe].safeSpace = True
+        
