@@ -12,7 +12,7 @@ class State:
         second_coord = self.toCoord(other_id)
         return (float)((second_coord[1] - first_coord[1])**2 + (second_coord[0] - first_coord[0])**2)**0.5
 
-    def nearest_zombie(self, GameBoard):  #pretty self explanatory
+    def nearest_zombie(self, GameBoard):  # pretty self explanatory
         smallest_dist = 100
         for state in GameBoard.States:
             if state.person != None:
@@ -22,7 +22,7 @@ class State:
                         smallest_dist = d
         return smallest_dist
 
-    def evaluate(self, action: str, GameBoard): # decides on the reward for a specific action based on what the board is like (for q learning)
+    def evaluate(self, action: str, GameBoard):  # decides on the reward for a specific action based on what the board is like (for q learning)
         reward = 0
         reward += self.nearest_zombie(GameBoard) - 3
         if action == "heal":
@@ -39,16 +39,16 @@ class State:
     def adjacent(self, GameBoard):  # returns the four adjacent boxes that are in bounds
         newCoord = GameBoard.toCoord(self.location)
         print(newCoord)
-        moves = [              #puts all four adjacent locations into moves
+        moves = [              # puts all four adjacent locations into moves
             (newCoord[0], newCoord[1] - 1),
             (newCoord[0], newCoord[1] + 1),
             (newCoord[0] - 1, newCoord[1]),
             (newCoord[0] + 1, newCoord[1]),
         ]
-        remove = []  #creates the ones to remove
+        remove = []  # creates the ones to remove
         for i in range(4):
             move = moves[i]
-            if (        #removes all illigal options
+            if (        # removes all illigal options
                 move[0] < 0
                 or move[0] > GameBoard.columns
                 or move[1] < 0
