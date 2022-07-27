@@ -482,15 +482,18 @@ class Board:
         for person in allzombs:
             self.States[allppl[person]].person.isZombie = True
 
-        #add one or boardSize/15 safe spaces
-        allsafes = []
-        for space in range(rd.randint(1, (self.rows*self.columns)//15)):
-            allsafes.append(rd.randint(0, len(self.States)))
-            while allsafes[-1] in allsafes[0:-1] or allsafes[-1] in allppl:
-                allsafes.remove(allsafes[-1])
-                allsafes.append(rd.randint(0, len(self.States)))
+        #add two safe spaces
+        noZombieInSafe = False
+        while not noZombieInSafe:
+            allsafes = rd.sample(range(len(self.States)), rd.randint(1, (self.rows*self.columns)//15))
+            for state in range(len(self.States)):
+                if (
+                    self.States[state].person is not None
+                    and self.States[state].person.isZombie
+                ):
+                    continue
+                else:
+                    noZombieInSafe = True
 
-        
-        for safe in allsafes:    
-            self.States[safe].safeSpace = True
-        
+                if state in allsafes:
+                    self.States[state].safeSpace = True
