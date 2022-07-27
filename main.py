@@ -6,8 +6,6 @@ import random as rd
 from constants import *
 import time
 
-from PygameFunctions import get_reward
-
 # Player role variables
 player_role = Role.government  # Valid options are Role.government and Role.zombie
 roleToRoleNum = {Role.government: 1, Role.zombie: -1}
@@ -117,7 +115,9 @@ while running:
                     if result != Result.invalid:
                         playerMoved = True
                     elif result == Result.success:
-                        player_score += get_reward(take_action[0])
+                        print(player_score)
+                        player_score += PF.get_reward(take_action[0])
+                        PF.screen.blit(font.render("Score: " + str(player_score), True, PF.WHITE),(900,500))
                         #if it succeeds, the player gets a reward corresponding to their action
                     take_action = []
             #Display the player's current score
