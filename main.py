@@ -49,7 +49,11 @@ while running:
                 not GameBoard.containsPerson(bool(player_role.value))
                 or GameBoard.outrage >= 100
             ):
-                running = PF.display_lose_screen()
+                if(GameBoard.outrage >= 100):
+                    running = PF.display_lose_screen(True)
+                else:
+                    running = PF.display_lose_screen(False)
+                
                 for state in GameBoard.States:
                     state.person = None
                     state.safeSpace = False
