@@ -23,7 +23,7 @@ class Node:
         Either a positive value when humans win, based on how many people remain, or a negative value when zombies win
         """
         reward = 0
-        if not gameRunning:
+        if not self.gameRunning:
             # checks if the game has ended before returning a reward value other than 0
             for s in state:
                 # this code has been written based on the assumption that that the state will be defined as Gameboard.states
