@@ -17,7 +17,22 @@ class Node:
         self.gameRunning = True
         return
 
-    def game_ended(self):
-        self.gameRunning = False
-
-
+def game_result(self):
+    """
+    Should return a reward value based on the result of the game
+    Either a positive value when humans win, based on how many people remain, or a negative value when zombies win
+    """
+    reward = 0
+    if gameRunning == False:
+        #checks if the game has ended before returning a reward value other than 0
+        for s in state:
+            #this code has been written based on the assumption that that the state will be defined as Gameboard.states
+            if s.person == True and s.person.isZombie == False:
+                reward += 1
+            else:
+                #returns a basic value of -10 whenever the zombies win, can be changed later
+                reward = -10
+    return reward
+    
+def game_ended(self):
+    self.gameRunning = False
