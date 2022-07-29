@@ -14,6 +14,7 @@ class Node:
         self.results[-1] = 0  # idk what those three lines do...
         self.untried_actions = None
         self.untried_actions = self.untried_actions()
+        self.gameRunning = True
         return
 
 def game_result(self):
@@ -32,3 +33,6 @@ def game_result(self):
                 #returns a basic value of -10 whenever the zombies win, can be changed later
                 reward = -10
     return reward
+    
+def game_ended(self):
+    self.gameRunning = False

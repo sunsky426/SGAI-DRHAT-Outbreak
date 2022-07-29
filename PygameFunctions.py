@@ -2,6 +2,7 @@ from typing import Tuple
 import pygame
 from constants import *
 from Board import Board
+from math import tanh
 
 
 # constants
@@ -85,7 +86,8 @@ def run(GameBoard: Board):
     #Draw the kill button slightly to the left of heal
     display_people(GameBoard)
     display_reset_move_button()
-    
+    screen.blit(font.render(f"public outrage: {int(GameBoard.outrage)} %", True, WHITE), (10, 10))
+    screen.blit(font.render(f"public anxiety: {int(GameBoard.anxiety)} %", True, WHITE), (10, 40))
     return pygame.event.get()
 
 
@@ -325,6 +327,17 @@ def display_lose_screen():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return
+
+#gets the reward for a certain action
+def get_reward(action):
+    if action == Action.move:
+        return 10
+    elif action == Action.heal:
+        return 1000
+    elif action == Action.kill:
+        return 100
+    elif action == Action.bite:
+        return -100
 
 def direction(coord1: Tuple[int, int], coord2: Tuple[int, int]):    
     if coord1 == coord2:
