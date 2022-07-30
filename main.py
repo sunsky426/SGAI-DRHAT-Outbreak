@@ -38,11 +38,13 @@ while running:
     if start == False:
         try:
             start = PF.disp_title_screen()
+            
         #Throws exception when user quits program using in-game button
         except pygame.error:
             print("Game closed by user")
             break
     elif start == True:
+        #instructions = PF.display_instructions()
         P = PF.run(GameBoard)
         if SELF_PLAY:
             if(
