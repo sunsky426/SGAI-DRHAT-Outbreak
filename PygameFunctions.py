@@ -110,12 +110,63 @@ def disp_title_screen():
         screen.blit(quit_text, (570, 525))
         for i in pygame.event.get():
             if i.type == pygame.MOUSEBUTTONDOWN:
-                if 500 <= mouse[0] <= 700 and 350 <= mouse[1] <= 450:
+                if 500 <= mouse[0] <= 700 and 350 <= mouse[1] <= 450:   
+                    display_instructions() 
+                    pygame.time.wait(15000)
                     return True
                 elif 500 <= mouse[0] <= 700 and 500 <= mouse[1] <= 600:
                         pygame.display.quit()
                         break
         pygame.display.update()
+
+def display_instructions():
+    """
+    Displays instructions for the game if the player clicks Start button
+    """
+    mouse = pygame.mouse.get_pos()
+
+    screen.fill(BACKGROUND)
+    screen.blit(
+        font.render("TO PLAY: ", True, BLACK), 
+        (GAME_WINDOW_DIMENSIONS[0]/2 - 100, 100))
+    screen.blit(
+        font.render("Each turn, you may either move, cure/vaccinate, or kill", True, BLACK),
+        (100, 150),
+    )
+    screen.blit(
+        font.render("Blue squares are 'safe spaces' where zombies cannot bite you", True, BLACK),
+        (100, 200),
+    )
+    screen.blit(
+        font.render("You can equip vaccines within safe spaces", True, BLACK),
+        (100, 250),
+    )
+    screen.blit(
+        font.render("Curing a zombie has a 50% chance of failure, after which the zombie can bite you back", True, BLACK),
+        (100, 300),
+    )
+    screen.blit(
+        font.render("Public outrage and anxiety levels are displayed at the top", True, BLACK),
+        (100, 400),
+    )
+    screen.blit(
+        font.render("Outrage increases when you kill a zombie, Anxiety decreases when you cure a zombie", True, BLACK),
+        (100, 450),
+    )
+    screen.blit(
+        font.render("If public outrage reaches 100%, you lose", True, BLACK),
+        (100, 500),
+    )
+    screen.blit(
+        font.render("When there are no zombies lef, you win", True, BLACK),
+        (100, 550),
+    )
+    screen.blit(
+        font.render("Good luck! (You'll need it) ", True, BLACK),
+        (100, 650),
+    )
+    pygame.display.update()
+
 
 def display_safe_space(GameBoard):
     """
