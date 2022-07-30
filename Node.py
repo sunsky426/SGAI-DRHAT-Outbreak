@@ -4,18 +4,81 @@ from collections import defaultdict
 
 class Node:
     def __init__(self, state, parent=None, parent_action=None):
-        self.state = state  # human or zombie? dead or alive? vaxxed or unvaxxed?
-        self.parent = parent
-        self.parent_action = parent_action  # action which parent carried out, none for root node (since no parent)
+        self.state = state  # the board state
+        self.parent = parent # whatever node this node came from, root node has no parent
+        self.parent_action = parent_action  # action which parent carried out, root node is none again
         self.children = []  # all possible actions from current node
-        self.num_visits = 0
-        self.results = defaultdict(int)
-        self.results[1] = 0
-        self.results[-1] = 0  # idk what those three lines do...
-        self.untried_actions = None
+        self.num_visits = 0 #how many times the node is visited
+        self.results = defaultdict(int) #has all the possible results of a game, but for ours its only win or lose, so 1 or -1
+        self.results[1] = 0 #starts with 0 wins
+        self.results[-1] = 0  # starts with 0 losses
+        self.untried_actions = None #all possible actions
         self.untried_actions = self.untried_actions()
-        self.gameRunning = True
+        self.gameRunning = True #added variable that says when the game is running
         return
+
+    def untried_actions(self): #starts with all possible actions, then is shrunk later in the expand function
+        self._untried_actions = self.state.get_legal_actions()
+        return self._untried_actions
+
+    def q(self): #returns wins - losses of all of the children (I think)
+        wins = self._results[1]
+        losses = self._results[-1]
+        return wins - losses
+
+    def n(self):
+        return self._number_of_visits
+    
+    def expand(self):
+        action = self._untried_actions.pop() #takes an action from untried actions
+        next_state = self.state.move(action) #creates the state after that move happens
+        child_node = Node(next_state, parent=self, parent_action=action) #creates a node with that state and action as a child of this node
+        self.children.append(child_node) #adds that node to the children of this node
+        return child_node #returns the child node
+    
+    def is_terminal_node(self): #checks if this is the last node in the branch
+        return self.state.is_game_over()
+
+    def rollout(self):
+        current_rollout_state = self.state 
+        while not current_rollout_state.is_game_over(): #while the node is not a terminal node
+            possible_moves = current_rollout_state.get_legal_actions() #get all moves from this node
+            action = self.rollout_policy(possible_moves) #select a move using the rollout policy (random by default)
+            current_rollout_state = current_rollout_state.move(action) #change the node to the state after said action is made
+        return current_rollout_state.game_result() #loop the above until the game ends, then return the game result
+    
+    def backpropagate(self, result): #send the information from the node back to the root
+        self._number_of_visits += 1. #adds number of visits to all the nodes above
+        self._results[result] += 1. #adds the result of the terminal node to the dictionary of all possible results
+        if self.parent:
+            self.parent.backpropagate(result) # recurrs
+    
+    def is_fully_expanded(self):
+        return len(self._untried_actions) == 0 #if there are no actions possible (this stops making children i think)
+
+    def best_child(self, c_param=0.1): #returns the best child from this node
+        choices_weights = [(c.q() / c.n()) + c_param * np.sqrt((2 * np.log(self.n()) / c.n())) for c in self.children] #calculates the 'value' of each child
+        return self.children[np.argmax(choices_weights)] #returns the child that corrosponds to the highest value in the above list
+    
+    def rollout_policy(self, possible_moves): #how to select a move, currently random but I think we change it later
+        return possible_moves[np.random.randint(len(possible_moves))]
+
+    def _tree_policy(self): #branches every node
+        current_node = self
+        while not current_node.is_terminal_node(): #while selected node is not the last node
+            if not current_node.is_fully_expanded(): # if the selected node hasnt been expanded, expand it
+                return current_node.expand()
+            else:
+                current_node = current_node.best_child() #if it has been expanded, return the best node of the children
+        return current_node #in the end, return the best node of all of the children of this node, this is the mcts program basically
+    
+    def best_action(self): #pretty self explanatory
+        simulation_no = 100
+        for i in range(simulation_no): #creates simulations
+            v = self._tree_policy() #makes all the nodes
+            reward = v.rollout() #does the moves for all the nodes
+            v.backpropagate(reward) #send all the info back to the root
+        return self.best_child(c_param=0.) #return the best node for the root to choose
 
     def game_result(self, board):
         """
