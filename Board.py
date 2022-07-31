@@ -494,3 +494,122 @@ class Board:
         for safe in allsafes:    
             self.States[safe].safeSpace = True
         
+
+
+
+
+#Helper methods for the get_legal_actions method in Node class 
+
+    def move_validity(self, coords: Tuple[int, int], direction: Direction) -> Result:
+        new_coords = self.getTargetCoords(coords, direction)
+        if direction == Direction.self: return Result.invalid
+        if not self.isValidCoordinate(new_coords): return Result.invalid
+        
+        # Get the start and destination index (1D)
+        start_idx = self.toIndex(coords)
+        destination_idx = self.toIndex(new_coords)
+
+        # Check if the new coordinates are valid
+        if not self.isValidCoordinate(new_coords):
+            return Result.invalid
+        if(
+            self.States[start_idx].person.isZombie
+            and self.States[destination_idx].safeSpace
+        ):
+            return Result.invalid
+
+        # Check if the destination is currently occupied
+        if self.States[destination_idx].person is None:
+            return Result.success
+        return Result.invalid
+
+    def heal_validity(self, coords: Tuple[int, int], direction: Direction) -> Result:
+        target_coords = self.getTargetCoords(coords, direction)
+        if not self.isValidCoordinate(target_coords): return Result.invalid
+        
+        # Get the start and destination index (1D)
+        start_idx = self.toIndex(coords)
+        target_idx = self.toIndex(target_coords)
+
+        #check if the orgin is valid
+        if (
+            self.States[start_idx].person is None
+            or self.States[start_idx].person.hasMed == False
+            or self.States[start_idx].person.isZombie
+            or self.States[start_idx].safeSpace
+        ):
+            return Result.invalid
+        
+        
+        # Check if the destination is valid
+        if (
+            self.States[target_idx].person is None
+        ):
+            return Result.invalid
+            
+        #probability of heal vs failed heal
+        if self.States[target_idx].person.isZombie:
+            chance = 50
+        else:
+            chance = 100
+        
+        r = rd.randint(0, 100)
+        self.States[start_idx].person.hasMed = False
+        return Result.success
+
+
+    def kill_validity(self, coords: Tuple[int, int], direction: Direction) -> Result:
+        target_coords = self.getTargetCoords(coords, direction)
+        if direction == Direction.self: return Result.invalid
+        if not self.isValidCoordinate(target_coords): return Result.invalid
+        
+        # Get the start and destination index (1D)
+        start_idx = self.toIndex(coords)
+        target_idx = self.toIndex(target_coords)
+
+        #check if the orgin is valid
+        if (
+            self.States[start_idx].person is None
+            or self.States[start_idx].person.isZombie
+            or self.States[start_idx].safeSpace
+        ):
+            return Result.invalid
+
+        # Check if the destination is valid
+        if (
+            self.States[target_idx].person is None
+            or not self.States[target_idx].person.isZombie
+        ):
+            return Result.invalid
+        return Result.success
+
+    def bite_validity(self, coords: Tuple[int, int], direction: Direction) -> Result:
+        target_coords = self.getTargetCoords(coords, direction)
+        if direction == Direction.self: return Result.invalid
+        if not self.isValidCoordinate(target_coords): return Result.invalid
+        
+        # Get the start and destination index (1D)
+        start_idx = self.toIndex(coords)
+        target_idx = self.toIndex(target_coords)
+
+        #check if the orgin is valid
+        if (
+            self.States[start_idx].person is None
+            or not self.States[start_idx].person.isZombie
+        ):
+            return Result.invalid
+        if(
+            self.States[start_idx].person.isZombie
+            and self.States[target_idx].safeSpace
+        ):
+            return Result.invalid
+        
+        
+        # Check if the destination is valid
+        if (
+            self.States[target_idx].person is None
+            or self.States[target_idx].person.isZombie
+            or self.States[target_idx].safeSpace
+        ):
+            return Result.invalid
+        return Result.success
