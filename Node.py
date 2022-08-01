@@ -14,24 +14,24 @@ class Node:
         self.results[1] = 0 #starts with 0 wins
         self.results[-1] = 0  # starts with 0 losses
         self.untried_actions = None #all possible actions
-        self.untried_actions = self.untried_actions()
+        self.untried_actions()
         self.gameRunning = True #added variable that says when the game is running
         return
 
     def untried_actions(self): #starts with all possible actions, then is shrunk later in the expand function
-        self._untried_diraction = self.state.get_legal_diractions()
-        return self._untried_diractions
+        self.untried_diraction = self.state.get_legal_diractions()
+        return self.untried_diractions
 
     def q(self): #returns wins - losses of all of the children (I think)
-        wins = self._results[1]
-        losses = self._results[-1]
+        wins = self.results[1]
+        losses = self.results[-1]
         return wins - losses
 
     def n(self):
-        return self._number_of_visits
+        return self.num_visits
     
     def expand(self):
-        start, action, direction, target = self._untried_diractions.pop() #takes an action from untried actions
+        start, action, direction, target = self.untried_diractions.pop() #takes an action from untried actions
         next_state = self.state.act[action](start, direction) #creates the state after that move happens
         child_node = Node(next_state, parent=self, parent_action=(start, action, direction, target)) #creates a node with that state and action as a child of this node
         self.children.append(child_node) #adds that node to the children of this node
@@ -49,13 +49,13 @@ class Node:
         return current_rollout_state.game_result() #loop the above until the game ends, then return the game result
     
     def backpropagate(self, result): #send the information from the node back to the root
-        self._number_of_visits += 1. #adds number of visits to all the nodes above
-        self._results[result] += 1. #adds the result of the terminal node to the dictionary of all possible results
+        self.num_visits += 1. #adds number of visits to all the nodes above
+        self.results[result] += 1. #adds the result of the terminal node to the dictionary of all possible results
         if self.parent is not None:
             self.parent.backpropagate(result) # recurrs
     
     def is_fully_expanded(self):
-        return len(self._untried_actions) == 0 #if there are no actions possible (this stops making children i think)
+        return len(self.untried_actions) == 0 #if there are no actions possible (this stops making children i think)
 
     def best_child(self, c_param=0.1): #returns the best child from this node
         choices_weights = [(c.q() / c.n()) + c_param * np.sqrt((2 * np.log(self.n()) / c.n())) for c in self.children] #calculates the 'value' of each child
