@@ -99,7 +99,7 @@ class Node:
         return reward
 
     def game_ended(self):
-        self.gameRunning = False
+        return self.state.num_zombies() == self.state.population or self.state.num_zombies() == 0
 
     def add_children(self):
         """
