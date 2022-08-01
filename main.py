@@ -136,34 +136,74 @@ while running:
                 playerMoved = False
                 take_action = []
 
-                if player_role == Role.government:
-                    possible_actions = [Action.move, Action.bite]
-                    computer_role = Role.zombie
-                else:
-                    possible_actions = [Action.move, Action.heal, Action.kill]
-                    computer_role = Role.government
+                #if player_role == Role.government:
+                #    possible_actions = [Action.move, Action.bite]
+                #    computer_role = Role.zombie
+                #else:
+                ##    possible_actions = [Action.move, Action.heal, Action.kill]
+                #    computer_role = Role.government
 
-                possible_move_coords = []
-                #Cycles through actions
-                while len(possible_move_coords) == 0 and len(possible_actions) != 0:
-                    possible_direction = [member for name, member in Direction.__members__.items()]
-                    action = rd.choice(possible_actions)
-                    #cycles through directions
-                    while len(possible_move_coords) == 0 and len(possible_direction) != 0:
+                computer_role = Role.zombie
+                possible_act_coords = []
+
+                #check if possible to bite
+                action = Action.bite
+                possible_direction = [member for name, member in Direction.__members__.items()]
+                while len(possible_act_coords) == 0 and len(possible_direction) != 0:
                         direction = rd.choice(possible_direction)
                         possible_direction.remove(direction)
-                        possible_move_coords = GameBoard.get_possible_moves(
+                        possible_act_coords = GameBoard.get_possible_moves(
                             action, direction, computer_role
                         )
-                    possible_actions.remove(action)
-                    print("possible actions is", possible_actions)
+                
+                if len(possible_act_coords) == 0:
+                    #try moving a zombie close enough to player
+                    action = Action.move
+
+                    for idx in range(len(GameBoard.States)):
+                        state = GameBoard.States[idx]
+                        if(
+                            state.person is not None 
+                            and state.person.isZombie == True
+                        ):
+                            for i in range(0, 2):
+                                for j in range(0, 2):
+                                    coords_viewed = (GameBoard.toCoord(idx)[0] + i,
+                                            GameBoard.toCoord(idx)[1] + j
+                                            )
+                                    try:
+                                        state_viewed = GameBoard.States[GameBoard.toIndex(coords_viewed)]
+                                    except IndexError:
+                                        continue
+                                    if(
+                                        state_viewed.person is not None
+                                        and state_viewed.person.isZombie == False
+                                    ):
+                                        print("WOWOWO", GameBoard.toCoord(state.location), coords_viewed)
+                                        possible_act_coords.append(GameBoard.toCoord(idx))
+                                        direction = PF.direction(GameBoard.toCoord(idx), coords_viewed)
+                    
+                    if len(possible_act_coords) == 0:
+                        #just make a random move
+                        possible_actions = [Action.move, Action.bite]
+                        #Cycles through actions
+                        while len(possible_act_coords) == 0 and len(possible_actions) != 0:
+                            possible_direction = [member for name, member in Direction.__members__.items()]
+                            action = rd.choice(possible_actions)
+                            #cycles through directions
+                            while len(possible_act_coords) == 0 and len(possible_direction) != 0:
+                                direction = rd.choice(possible_direction)
+                                possible_direction.remove(direction)
+                                possible_act_coords = GameBoard.get_possible_moves(
+                                    action, direction, computer_role
+                                )
+                            possible_actions.remove(action)
 
                 # no valid moves, player wins
                 #Displays two buttons and allows the player to play again on a new randomized map
                 if (
-                    len(possible_actions) == 0 
-                    and len(possible_direction) == 0
-                    and len(possible_move_coords) == 0
+                    len(possible_direction) == 0
+                    and len(possible_act_coords) == 0
                 ):
                     running = PF.display_win_screen()
                     for state in GameBoard.States:
@@ -174,7 +214,7 @@ while running:
                     continue
 
                 # Select the destination coordinates
-                move_coord = rd.choice(possible_move_coords)
+                move_coord = rd.choice(possible_act_coords)
 
                 # Implement the selected action
                 print("action chosen is", action)
@@ -235,7 +275,7 @@ while running:
             ns = reward[1]
             NewStateAct = GameBoard.QGreedyat(ns)
             NS = GameBoard.QTable[ns][NewStateAct[0]]
-            # GameBoard.QTable[i] = GameBoard.QTable[i] + alpha * (reward[0] + gamma * NS) - GameBoard.QTable[i]
+            GameBoard.QTable[i] = GameBoard.QTable[i] + alpha * (reward[0] + gamma * NS) - GameBoard.QTable[i]
             if GameBoard.num_zombies() == 0:
                 print("winCase")
 
