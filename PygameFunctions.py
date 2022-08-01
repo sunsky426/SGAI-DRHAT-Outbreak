@@ -6,7 +6,6 @@ from math import tanh
 
 
 # constants
-BACKGROUND = "#DDC2A1"
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 CELL_COLOR = (233, 222, 188)
@@ -17,12 +16,13 @@ RESET_MOVE_COORDS = (800, 600)
 RESET_MOVE_DIMS = (200, 50)
 
 # Initialize pygame
+BACKGROUND = pygame.transform.scale(pygame.image.load("Assets/BG.png"), (1200, 1000))
 screen = pygame.display.set_mode(GAME_WINDOW_DIMENSIONS)
 pygame.display.set_caption("Outbreak!")
 pygame.font.init()
 font = pygame.font.SysFont("Impact", 30)
 pygame.display.set_caption("Outbreak!")
-screen.fill(BACKGROUND)
+screen.blit(BACKGROUND, (0, 0))
 
 
 def get_action(GameBoard: Board, pixel_x: int, pixel_y: int):
@@ -73,7 +73,7 @@ def run(GameBoard: Board):
     """
     Draw the screen and return any events.
     """
-    screen.fill(BACKGROUND)
+    screen.blit(BACKGROUND, (0, 0))
     build_grid(GameBoard)  # Draw the grid
     
     # Draw the heal icon
@@ -97,7 +97,7 @@ def disp_title_screen():
     """
     start_text = font.render('START', True, WHITE)
     quit_text = font.render('QUIT', True, WHITE)
-    screen.fill(BACKGROUND)
+    screen.blit(BACKGROUND, (0, 0))
     #Draw title
     display_image(screen, "Assets/Outbreak_title.png", (1048, 238), (76, 100))
     #Check if the user has clicked either start or quit
@@ -210,11 +210,15 @@ def build_grid(GameBoard: Board):
         ],
     )
     # Fill the inside wioth the cell color
-    pygame.draw.rect(
-        screen,
-        CELL_COLOR,
-        [GameBoard.display_border, GameBoard.display_border, grid_width, grid_height],
-    )
+    s = pygame.Surface((grid_width, grid_height))  # the size of your rect
+    s.set_alpha(91)                # alpha level
+    s.fill((154,75,75))           # this fills the entire surface
+    screen.blit(s, (GameBoard.display_border, GameBoard.display_border))
+    #pygame.draw.rect(
+     #   screen,
+    #    CELL_COLOR,
+    #    [GameBoard.display_border, GameBoard.display_border, ],
+    #)
     #Draw the safe space so that it is under the lines
     display_safe_space(GameBoard)
     # Draw the vertical lines
@@ -244,7 +248,7 @@ def display_people(GameBoard: Board):
             if p.isZombie:
                 char = "Assets/person_zombie.png"
             elif p.isVaccinated:
-                char = "Assets/person_normal.png"
+                char = "Assets/person_vax.png"
             coords = (
                 int(x % GameBoard.rows) * GameBoard.display_cell_dimensions[0]
                 + GameBoard.display_border
@@ -261,7 +265,7 @@ def display_people(GameBoard: Board):
 def display_win_screen():
     restart_text = font.render('PLAY AGAIN', True, WHITE)
     quit_text = font.render('QUIT', True, WHITE)
-    screen.fill(BACKGROUND)
+    screen.blit(BACKGROUND, (0, 0))
     screen.blit(
         font.render("You win!", True, WHITE),
         (500, 350),
@@ -297,7 +301,7 @@ def display_lose_screen():
     restart_text = font.render('PLAY AGAIN', True, WHITE)
     quit_text = font.render('QUIT', True, WHITE)
 
-    screen.fill(BACKGROUND)
+    screen.blit(BACKGROUND, (0, 0))
     screen.blit(
         font.render("You lose!", True, WHITE),
         (500, 350),
