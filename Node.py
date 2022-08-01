@@ -1,9 +1,10 @@
 import numpy as np
 from collections import defaultdict
+from Board import Board
 
 
 class Node:
-    def __init__(self, state, parent=None, parent_action=None):
+    def __init__(self, state: Board, parent=None, parent_action=None):
         self.state = state  # the board state
         self.parent = parent # whatever node this node came from, root node has no parent
         self.parent_action = parent_action  # action which parent carried out, root node is none again
@@ -18,8 +19,8 @@ class Node:
         return
 
     def untried_actions(self): #starts with all possible actions, then is shrunk later in the expand function
-        self._untried_actions = self.state.get_legal_actions()
-        return self._untried_actions
+        self._untried_diraction = self.state.get_legal_diractions()
+        return self._untried_diractions
 
     def q(self): #returns wins - losses of all of the children (I think)
         wins = self._results[1]
@@ -31,7 +32,7 @@ class Node:
     
     def expand(self):
         action = self._untried_actions.pop() #takes an action from untried actions
-        next_state = self.state.move(action) #creates the state after that move happens
+        next_state = self.state.act(action) #creates the state after that move happens
         child_node = Node(next_state, parent=self, parent_action=action) #creates a node with that state and action as a child of this node
         self.children.append(child_node) #adds that node to the children of this node
         return child_node #returns the child node
@@ -50,7 +51,7 @@ class Node:
     def backpropagate(self, result): #send the information from the node back to the root
         self._number_of_visits += 1. #adds number of visits to all the nodes above
         self._results[result] += 1. #adds the result of the terminal node to the dictionary of all possible results
-        if self.parent:
+        if self.parent is not None:
             self.parent.backpropagate(result) # recurrs
     
     def is_fully_expanded(self):

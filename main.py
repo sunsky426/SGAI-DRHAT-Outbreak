@@ -113,7 +113,7 @@ while running:
             if len(take_action) > 2:
                     directionToMove = PF.direction(take_action[1], take_action[2])
                     print("Implementing", take_action[0], "to", directionToMove)
-                    result = GameBoard.actionToFunction[take_action[0]](take_action[1], directionToMove)
+                    result = GameBoard.act[take_action[0]](take_action[1], directionToMove)
                     print(f"did it succeed? {result}")
 
                     if result == Result.success:
@@ -181,7 +181,7 @@ while running:
                 # Implement the selected action
                 print("action chosen is", action)
                 print("move start coord is", move_coord)
-                print(GameBoard.actionToFunction[action](move_coord, direction))
+                print(GameBoard.act[action](move_coord, direction))
                 print("stopping")
 
         # Update the display
@@ -260,7 +260,7 @@ while running:
                 if len(poss) > 0:
                     r = rd.randint(0, len(poss) - 1)
                     a = poss[r]
-                    GameBoard.actionToFunction[ta](a)
+                    GameBoard.act[ta](a)
                 if GameBoard.num_zombies() == GameBoard.population:
                     print("loseCase")
                 if event.type == pygame.QUIT:
