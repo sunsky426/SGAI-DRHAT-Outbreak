@@ -9,7 +9,7 @@ from math import tanh
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 CELL_COLOR = (233, 222, 188)
-SAFE_COLOR = (93, 138, 168)
+SAFE_COLOR = (93, 148, 215)
 LINE_WIDTH = 5
 GAME_WINDOW_DIMENSIONS = (1200, 800)
 RESET_MOVE_COORDS = (800, 600)
@@ -117,20 +117,19 @@ def disp_title_screen():
                         break
         pygame.display.update()
 
-def display_safe_space(GameBoard):
+def display_safe_space(GameBoard, surface):
     """
     Creates a blue rectangle at every safe space state
     """
     for state in GameBoard.States:
         if state.safeSpace:
             coords = (
-                int(GameBoard.toCoord(state.location)[0]) * GameBoard.display_cell_dimensions[0]
-                + GameBoard.display_border,
-                int(GameBoard.toCoord(state.location)[1]) * GameBoard.display_cell_dimensions[1]
-                + GameBoard.display_border,
+                int(GameBoard.toCoord(state.location)[0]) * GameBoard.display_cell_dimensions[0],
+                int(GameBoard.toCoord(state.location)[1]) * GameBoard.display_cell_dimensions[1],
             )
             #draw a rectangle of dimensions 100x100 at the coordinates created above
-            pygame.draw.rect(screen, SAFE_COLOR, pygame.Rect(coords[0], coords[1], 100, 100))
+            pygame.draw.rect(surface, SAFE_COLOR, pygame.Rect(coords[0], coords[1], 100, 100))
+            screen.blit(surface, (GameBoard.display_border, GameBoard.display_border))
 
 
 def display_reset_move_button():
@@ -210,17 +209,12 @@ def build_grid(GameBoard: Board):
         ],
     )
     # Fill the inside wioth the cell color
-    s = pygame.Surface((grid_width, grid_height))  # the size of your rect
-    s.set_alpha(91)                # alpha level
-    s.fill((154,75,75))           # this fills the entire surface
-    screen.blit(s, (GameBoard.display_border, GameBoard.display_border))
-    #pygame.draw.rect(
-     #   screen,
-    #    CELL_COLOR,
-    #    [GameBoard.display_border, GameBoard.display_border, ],
-    #)
+    surface = pygame.Surface((grid_width, grid_height))  # the size of your rect
+    surface.set_alpha(91)                # alpha level
+    surface.fill((154,75,75))           # this fills the entire surface
+    screen.blit(surface, (GameBoard.display_border, GameBoard.display_border))
     #Draw the safe space so that it is under the lines
-    display_safe_space(GameBoard)
+    display_safe_space(GameBoard, surface)
     # Draw the vertical lines
     i = GameBoard.display_border + GameBoard.display_cell_dimensions[0]
     while i < GameBoard.display_border + grid_width:
