@@ -78,7 +78,7 @@ def run(GameBoard: Board):
     
     # Draw the heal icon
     if GameBoard.player_role == Role.government:
-        display_image(screen, "Assets/cure.jpeg", GameBoard.display_cell_dimensions, (950, 200))
+        display_image(screen, "Assets/cure.png", GameBoard.display_cell_dimensions, (950, 200))
         display_image(screen, "Assets/kill.png", GameBoard.display_cell_dimensions, (800, 200))
         display_image(screen, "Assets/RedCross.png", GameBoard.display_cell_dimensions, (800, 300))
     else:
@@ -244,7 +244,7 @@ def display_people(GameBoard: Board):
             if p.isZombie:
                 char = "Assets/person_zombie.png"
             elif p.isVaccinated:
-                char = "Assets/person_vax.png"
+                char = "Assets/person_normal.png"
             coords = (
                 int(x % GameBoard.rows) * GameBoard.display_cell_dimensions[0]
                 + GameBoard.display_border
