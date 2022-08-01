@@ -162,12 +162,14 @@ while running:
 
                     for idx in range(len(GameBoard.States)):
                         state = GameBoard.States[idx]
+                        two2two = list(range(-2, 2))
                         if(
                             state.person is not None 
                             and state.person.isZombie == True
-                        ):
-                            for i in range(0, 2):
-                                for j in range(0, 2):
+                        ):  
+                            rd.shuffle(two2two)
+                            for i in two2two:
+                                for j in two2two:
                                     coords_viewed = (GameBoard.toCoord(idx)[0] + i,
                                             GameBoard.toCoord(idx)[1] + j
                                             )
@@ -179,8 +181,6 @@ while running:
                                         state_viewed.person is not None
                                         and state_viewed.person.isZombie == False
                                     ):
-                                        print("WOWOWO", GameBoard.toCoord(state.location), coords_viewed)
-                                        possible_act_coords.append(GameBoard.toCoord(idx))
                                         direction = PF.direction(GameBoard.toCoord(idx), coords_viewed)
                     
                     if len(possible_act_coords) == 0:
