@@ -31,9 +31,9 @@ class Node:
         return self._number_of_visits
     
     def expand(self):
-        action = self._untried_actions.pop() #takes an action from untried actions
-        next_state = self.state.act(action) #creates the state after that move happens
-        child_node = Node(next_state, parent=self, parent_action=action) #creates a node with that state and action as a child of this node
+        start, action, direction, target = self._untried_diractions.pop() #takes an action from untried actions
+        next_state = self.state.act[action](start, direction) #creates the state after that move happens
+        child_node = Node(next_state, parent=self, parent_action=(start, action, direction, target)) #creates a node with that state and action as a child of this node
         self.children.append(child_node) #adds that node to the children of this node
         return child_node #returns the child node
     
