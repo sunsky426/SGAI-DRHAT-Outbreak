@@ -14,13 +14,13 @@ class Node:
         self.results[1] = 0 #starts with 0 wins
         self.results[-1] = 0  # starts with 0 losses
         self.untried_actions = None #all possible actions
-        self.untried_actions()
+        self.untried_action()
         self.gameRunning = True #added variable that says when the game is running
         return
 
-    def untried_actions(self): #starts with all possible actions, then is shrunk later in the expand function
-        self.untried_diraction = self.state.get_legal_diractions()
-        return self.untried_diractions
+    def untried_action(self): #starts with all possible actions, then is shrunk later in the expand function
+        self.untried_actions = self.state.get_legal_actions()
+        return self.untried_actions
 
     def q(self): #returns wins - losses of all of the children (I think)
         wins = self.results[1]
@@ -31,7 +31,7 @@ class Node:
         return self.num_visits
     
     def expand(self):
-        start, action, direction, target = self.untried_diractions.pop() #takes an action from untried actions
+        start, action, direction, target = self.untried_actions.pop() #takes an action from untried actions
         next_state = self.state.act[action](start, direction) #creates the state after that move happens
         child_node = Node(next_state, parent=self, parent_action=(start, action, direction, target)) #creates a node with that state and action as a child of this node
         self.children.append(child_node) #adds that node to the children of this node
@@ -52,7 +52,7 @@ class Node:
         self.num_visits += 1. #adds number of visits to all the nodes above
         self.results[result] += 1. #adds the result of the terminal node to the dictionary of all possible results
         if self.parent is not None:
-            self.parent.backpropagate(result) # recurrs
+            self.parent.backpropagate(result) # recursion
     
     def is_fully_expanded(self):
         return len(self.untried_actions) == 0 #if there are no actions possible (this stops making children i think)
@@ -67,7 +67,7 @@ class Node:
     def _tree_policy(self): #branches every node
         current_node = self
         while not current_node.is_terminal_node(): #while selected node is not the last node
-            if not current_node.is_fully_expanded(): # if the selected node hasnt been expanded, expand it
+            if not current_node.is_fully_expanded(): # if the selected node hasnt been fully expanded, expand it
                 return current_node.expand()
             else:
                 current_node = current_node.best_child() #if it has been expanded, return the best node of the children
