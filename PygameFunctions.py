@@ -86,10 +86,18 @@ def run(GameBoard: Board):
     #Draw the kill button slightly to the left of heal
     display_people(GameBoard)
     display_reset_move_button()
-    screen.blit(font.render(f"public outrage: {int(GameBoard.outrage)} %", True, WHITE), (10, 10))
-    screen.blit(font.render(f"public anxiety: {int(GameBoard.anxiety)} %", True, WHITE), (10, 40))
+    disp_public_opinion(GameBoard)
     return pygame.event.get()
 
+def disp_public_opinion(GameBoard: Board):
+    pygame.draw.rect(screen,BLACK,[200,40,510,30])
+    pygame.draw.rect(screen, (101, 28 ,50), [202.5, 43, 5 * GameBoard.outrage + 10 ,25])
+    pygame.draw.rect(screen,BLACK,[200,80,510,30])
+    pygame.draw.rect(screen, (101, 28 ,50), [202.5, 83, 5 * GameBoard.anxiety + 10 ,25])
+    #screen.blit(font.render(f"public outrage: {int(GameBoard.outrage)} %", True, WHITE), (10, 10))
+    #screen.blit(font.render(f"public anxiety: {int(GameBoard.anxiety)} %", True, WHITE), (10, 40))
+    display_image(screen, "Assets/outrage.png", (30, 30), (172, 40))
+    display_image(screen, "Assets/anxiety.png", (30, 30), (172, 80))
 
 def disp_title_screen():
     """
