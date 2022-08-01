@@ -129,7 +129,6 @@ def display_safe_space(GameBoard, surface):
             )
             #draw a rectangle of dimensions 100x100 at the coordinates created above
             pygame.draw.rect(surface, SAFE_COLOR, pygame.Rect(coords[0], coords[1], 100, 100))
-            screen.blit(surface, (GameBoard.display_border, GameBoard.display_border))
 
 
 def display_reset_move_button():
@@ -208,13 +207,14 @@ def build_grid(GameBoard: Board):
             LINE_WIDTH,
         ],
     )
-    # Fill the inside wioth the cell color
+    #create surface
     surface = pygame.Surface((grid_width, grid_height))  # the size of your rect
     surface.set_alpha(91)                # alpha level
-    surface.fill((154,75,75))           # this fills the entire surface
-    screen.blit(surface, (GameBoard.display_border, GameBoard.display_border))
+    surface.fill((160,150,150))           # this fills the entire surface
     #Draw the safe space so that it is under the lines
     display_safe_space(GameBoard, surface)
+    #blit surface onto screen
+    screen.blit(surface, (GameBoard.display_border, GameBoard.display_border))
     # Draw the vertical lines
     i = GameBoard.display_border + GameBoard.display_cell_dimensions[0]
     while i < GameBoard.display_border + grid_width:
