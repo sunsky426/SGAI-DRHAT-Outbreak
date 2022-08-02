@@ -6,23 +6,23 @@ from math import tanh
 
 
 # constants
-BACKGROUND = "#DDC2A1"
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 CELL_COLOR = (233, 222, 188)
-SAFE_COLOR = (93, 138, 168)
+SAFE_COLOR = (93, 148, 215)
 LINE_WIDTH = 5
 GAME_WINDOW_DIMENSIONS = (1200, 800)
 RESET_MOVE_COORDS = (800, 600)
 RESET_MOVE_DIMS = (200, 50)
 
 # Initialize pygame
+BACKGROUND = pygame.transform.scale(pygame.image.load("Assets/BG.png"), (1200, 1000))
 screen = pygame.display.set_mode(GAME_WINDOW_DIMENSIONS)
 pygame.display.set_caption("Outbreak!")
 pygame.font.init()
 font = pygame.font.SysFont("Impact", 30)
 pygame.display.set_caption("Outbreak!")
-screen.fill(BACKGROUND)
+screen.blit(BACKGROUND, (0, 0))
 
 
 def get_action(GameBoard: Board, pixel_x: int, pixel_y: int):
@@ -73,23 +73,31 @@ def run(GameBoard: Board):
     """
     Draw the screen and return any events.
     """
-    screen.fill(BACKGROUND)
+    screen.blit(BACKGROUND, (0, 0))
     build_grid(GameBoard)  # Draw the grid
     
     # Draw the heal icon
     if GameBoard.player_role == Role.government:
         display_image(screen, "Assets/cure.png", GameBoard.display_cell_dimensions, (950, 200))
         display_image(screen, "Assets/kill.png", GameBoard.display_cell_dimensions, (800, 200))
-        display_image(screen, "Assets/RedCross.png", GameBoard.display_cell_dimensions, (800, 300))
+        display_image(screen, "Assets/cross.png", GameBoard.display_cell_dimensions, (800, 300))
     else:
         display_image(screen, "Assets/bite.png", GameBoard.display_cell_dimensions, (950, 200))
     #Draw the kill button slightly to the left of heal
     display_people(GameBoard)
     display_reset_move_button()
-    screen.blit(font.render(f"public outrage: {int(GameBoard.outrage)} %", True, WHITE), (10, 10))
-    screen.blit(font.render(f"public anxiety: {int(GameBoard.anxiety)} %", True, WHITE), (10, 40))
+    disp_public_opinion(GameBoard)
     return pygame.event.get()
 
+def disp_public_opinion(GameBoard: Board):
+    pygame.draw.rect(screen,BLACK,[200,40,510,30])
+    pygame.draw.rect(screen, (101, 28 ,50), [202.5, 43, 5 * GameBoard.outrage + 10 ,25])
+    pygame.draw.rect(screen,BLACK,[200,80,510,30])
+    pygame.draw.rect(screen, (101, 28 ,50), [202.5, 83, 5 * GameBoard.anxiety + 10 ,25])
+    #screen.blit(font.render(f"public outrage: {int(GameBoard.outrage)} %", True, WHITE), (10, 10))
+    #screen.blit(font.render(f"public anxiety: {int(GameBoard.anxiety)} %", True, WHITE), (10, 40))
+    display_image(screen, "Assets/outrage.png", (30, 30), (172, 40))
+    display_image(screen, "Assets/anxiety.png", (30, 30), (172, 80))
 
 def disp_title_screen():
     """
@@ -97,7 +105,7 @@ def disp_title_screen():
     """
     start_text = font.render('START', True, WHITE)
     quit_text = font.render('QUIT', True, WHITE)
-    screen.fill(BACKGROUND)
+    screen.blit(BACKGROUND, (0, 0))
     #Draw title
     display_image(screen, "Assets/Outbreak_title.png", (1048, 238), (76, 100))
     #Check if the user has clicked either start or quit
@@ -117,20 +125,18 @@ def disp_title_screen():
                         break
         pygame.display.update()
 
-def display_safe_space(GameBoard):
+def display_safe_space(GameBoard, surface):
     """
     Creates a blue rectangle at every safe space state
     """
     for state in GameBoard.States:
         if state.safeSpace:
             coords = (
-                int(GameBoard.toCoord(state.location)[0]) * GameBoard.display_cell_dimensions[0]
-                + GameBoard.display_border,
-                int(GameBoard.toCoord(state.location)[1]) * GameBoard.display_cell_dimensions[1]
-                + GameBoard.display_border,
+                int(GameBoard.toCoord(state.location)[0]) * GameBoard.display_cell_dimensions[0],
+                int(GameBoard.toCoord(state.location)[1]) * GameBoard.display_cell_dimensions[1],
             )
             #draw a rectangle of dimensions 100x100 at the coordinates created above
-            pygame.draw.rect(screen, SAFE_COLOR, pygame.Rect(coords[0], coords[1], 100, 100))
+            pygame.draw.rect(surface, SAFE_COLOR, pygame.Rect(coords[0], coords[1], 100, 100))
 
 
 def display_reset_move_button():
@@ -209,14 +215,14 @@ def build_grid(GameBoard: Board):
             LINE_WIDTH,
         ],
     )
-    # Fill the inside wioth the cell color
-    pygame.draw.rect(
-        screen,
-        CELL_COLOR,
-        [GameBoard.display_border, GameBoard.display_border, grid_width, grid_height],
-    )
+    #create surface
+    surface = pygame.Surface((grid_width, grid_height))  # the size of your rect
+    surface.set_alpha(91)                # alpha level
+    surface.fill((160,150,150))           # this fills the entire surface
     #Draw the safe space so that it is under the lines
-    display_safe_space(GameBoard)
+    display_safe_space(GameBoard, surface)
+    #blit surface onto screen
+    screen.blit(surface, (GameBoard.display_border, GameBoard.display_border))
     # Draw the vertical lines
     i = GameBoard.display_border + GameBoard.display_cell_dimensions[0]
     while i < GameBoard.display_border + grid_width:
@@ -244,7 +250,7 @@ def display_people(GameBoard: Board):
             if p.isZombie:
                 char = "Assets/person_zombie.png"
             elif p.isVaccinated:
-                char = "Assets/person_normal.png"
+                char = "Assets/person_cure.png"
             coords = (
                 int(x % GameBoard.rows) * GameBoard.display_cell_dimensions[0]
                 + GameBoard.display_border
@@ -255,13 +261,13 @@ def display_people(GameBoard: Board):
             )
             display_image(screen, char, (35, 60), coords)
             if p.hasMed == True:
-                display_image(screen, "Assets/RedCross.png", (20, 20), (coords[0]+25, coords[1]))
+                display_image(screen, "Assets/cross.png", (20, 20), (coords[0]+25, coords[1]))
 
 #Creates buttons that allow the player to quit or restart
 def display_win_screen():
     restart_text = font.render('PLAY AGAIN', True, WHITE)
     quit_text = font.render('QUIT', True, WHITE)
-    screen.fill(BACKGROUND)
+    screen.blit(BACKGROUND, (0, 0))
     screen.blit(
         font.render("You win!", True, WHITE),
         (500, 350),
@@ -297,7 +303,7 @@ def display_lose_screen():
     restart_text = font.render('PLAY AGAIN', True, WHITE)
     quit_text = font.render('QUIT', True, WHITE)
 
-    screen.fill(BACKGROUND)
+    screen.blit(BACKGROUND, (0, 0))
     screen.blit(
         font.render("You lose!", True, WHITE),
         (500, 350),
