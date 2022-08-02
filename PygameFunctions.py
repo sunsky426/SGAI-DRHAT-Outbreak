@@ -80,7 +80,7 @@ def run(GameBoard: Board):
     if GameBoard.player_role == Role.government:
         display_image(screen, "Assets/cure.png", GameBoard.display_cell_dimensions, (950, 200))
         display_image(screen, "Assets/kill.png", GameBoard.display_cell_dimensions, (800, 200))
-        display_image(screen, "Assets/RedCross.png", GameBoard.display_cell_dimensions, (800, 300))
+        display_image(screen, "Assets/cross.png", GameBoard.display_cell_dimensions, (800, 300))
     else:
         display_image(screen, "Assets/bite.png", GameBoard.display_cell_dimensions, (950, 200))
     #Draw the kill button slightly to the left of heal
@@ -250,7 +250,7 @@ def display_people(GameBoard: Board):
             if p.isZombie:
                 char = "Assets/person_zombie.png"
             elif p.isVaccinated:
-                char = "Assets/person_vax.png"
+                char = "Assets/person_cure.png"
             coords = (
                 int(x % GameBoard.rows) * GameBoard.display_cell_dimensions[0]
                 + GameBoard.display_border
@@ -261,7 +261,7 @@ def display_people(GameBoard: Board):
             )
             display_image(screen, char, (35, 60), coords)
             if p.hasMed == True:
-                display_image(screen, "Assets/RedCross.png", (20, 20), (coords[0]+25, coords[1]))
+                display_image(screen, "Assets/cross.png", (20, 20), (coords[0]+25, coords[1]))
 
 #Creates buttons that allow the player to quit or restart
 def display_win_screen():
