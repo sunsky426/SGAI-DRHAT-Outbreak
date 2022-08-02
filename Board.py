@@ -175,9 +175,6 @@ class Board:
             new_coords = (coords[0] + 1, coords[1])
         elif direction == Direction.self:
             new_coords = coords
-        
-        if self.States[self.toIndex(coords)].person is not None:
-            self.States[self.toIndex(coords)].person.facing = Direction
 
         return new_coords
     
