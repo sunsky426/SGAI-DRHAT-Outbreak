@@ -52,14 +52,6 @@ class Board:
                     r += 1
         return r
 
-    def act(self, oldstate: Tuple[int, int], givenAction: str): # takes in the cell and action and performs that using the act
-        cell = self.toCoord(oldstate)
-        f = self.act[givenAction](cell)
-        reward = self.States[oldstate].evaluate(givenAction, self)
-        if f[0] == False:
-            reward = 0
-        return [reward, f[1]]
-
     def containsPerson(self, isZombie: bool): #checks if person is a person
         for state in self.States:
             if state.person is not None and state.person.isZombie == isZombie:
