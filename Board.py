@@ -37,7 +37,7 @@ class Board:
             self.States.append(State(None, s))
             self.QTable.append([0] * 6)
 
-        self.actionToFunction = {
+        self.act = {
             Action.move: self.move,
             Action.heal: self.heal,
             Action.bite: self.bite,
@@ -52,9 +52,9 @@ class Board:
                     r += 1
         return r
 
-    def act(self, oldstate: Tuple[int, int], givenAction: str): # takes in the cell and action and performs that using the actiontofunction
+    def act(self, oldstate: Tuple[int, int], givenAction: str): # takes in the cell and action and performs that using the act
         cell = self.toCoord(oldstate)
-        f = self.actionToFunction[givenAction](cell)
+        f = self.act[givenAction](cell)
         reward = self.States[oldstate].evaluate(givenAction, self)
         if f[0] == False:
             reward = 0
@@ -88,7 +88,7 @@ class Board:
 
                     if (
                         state.person.isZombie
-                        and bool(B.actionToFunction[action](B.toCoord(state.location), direction).value)
+                        and bool(B.act[action](B.toCoord(state.location), direction).value)
                     ):
                         poss.append(B.toCoord(state.location))
                         changed_states = True
@@ -111,7 +111,7 @@ class Board:
                     changed_states = False
                     if (
                         not state.person.isZombie
-                        and bool(B.actionToFunction[action](B.toCoord(state.location), direction).value)
+                        and bool(B.act[action](B.toCoord(state.location), direction).value)
                     ):
                         poss.append(B.toCoord(state.location))
                         changed_states = True
@@ -187,8 +187,6 @@ class Board:
             #print(f"going from {coords} to new coords {new_coords}")
         elif direction == Direction.self:
             new_coords = coords
-        
-        self.States[self.toIndex(coords)].person.facing = Direction
 
         return new_coords
     
