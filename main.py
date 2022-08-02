@@ -157,35 +157,34 @@ while running:
                         )
                 
                 if len(possible_act_coords) == 0:
-                    '''#try moving a zombie close enough to player
+                    #try moving a zombie close enough to player
                     action = Action.move
+                    human_coords = []
+                    zombie_coords = []
+                    best_dist = float("inf")
 
                     for idx in range(len(GameBoard.States)):
                         state = GameBoard.States[idx]
-                        two2two = list(range(-2, 2))
-                        if(
-                            state.person is not None 
-                            and state.person.isZombie == True
-                        ):  
-                            rd.shuffle(two2two)
-                            for i in two2two:
-                                for j in two2two:
-                                    coords_viewed = (GameBoard.toCoord(idx)[0] + i,
-                                            GameBoard.toCoord(idx)[1] + j
-                                            )
-                                    try:
-                                        state_viewed = GameBoard.States[GameBoard.toIndex(coords_viewed)]
-                                    except IndexError:
-                                        continue
-                                    if(
-                                        state_viewed.person is not None
-                                        and state_viewed.person.isZombie == False
-                                    ):
-                                        direction = PF.direction(GameBoard.toCoord(idx), coords_viewed)
-                                        B = GameBoard.clone(GameBoard.States, computer_role)
-                                        if B.act[Action.move](GameBoard.toCoord(idx), direction):
-                                            possible_act_coords.append(GameBoard.toCoord(idx))
-                                            print("WOW", GameBoard.toCoord(idx), coords_viewed)'''
+                        if state.person is not None:
+                            if state.person.isZombie == True:
+                                zombie_coords.append(GameBoard.toCoord(idx))
+                            else:
+                                human_coords.append(GameBoard.toCoord(idx))
+                        
+                        for zombie in zombie_coords:
+                            for victim in human_coords:
+                                dist = (zombie[0] - victim[0])**2 + (zombie[1] - victim[1])**2
+                                if dist < best_dist:
+                                    dir = PF.direction(zombie, victim)
+                                    B = GameBoard.clone(GameBoard.States, computer_role)
+                                    bruh = B.act[Action.move](zombie, dir)
+                                    if bruh != Result.invalid:
+                                        print(bruh)
+                                        direction = dir
+                                        best_dist = dist
+                                        possible_act_coords = []
+                                        possible_act_coords.append(zombie)
+                                        print("WOW", zombie, victim, dir)
                     
                     if len(possible_act_coords) == 0:
                         #just make a random move
@@ -217,8 +216,7 @@ while running:
                 move_coord = rd.choice(possible_act_coords)
 
                 # Implement the selected action
-                print("action chosen is", action)
-                print("move start coord is", move_coord)
+                print(action, direction, move_coord)
                 print(GameBoard.act[action](move_coord, direction))
                 print("stopping")
 
