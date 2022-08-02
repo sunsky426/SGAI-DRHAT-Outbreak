@@ -477,7 +477,7 @@ class Board:
         #add two safe spaces
         noZombieInSafe = False
         while not noZombieInSafe:
-            allsafes = rd.sample(range(len(self.States)), rd.randint(1, (self.rows*self.columns)//15))
+            allsafes = rd.sample(range(len(self.States)), (self.rows*self.columns)//15)
             for state in range(len(self.States)):
                 if (
                     self.States[state].person is not None
