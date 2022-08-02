@@ -299,7 +299,8 @@ def display_win_screen():
                 return
 
 #similar code, just for a loss case
-def display_lose_screen():
+#outrage is a boolean that is true if the player lost bc public outrage was too high
+def display_lose_screen(outrage):
     restart_text = font.render('PLAY AGAIN', True, WHITE)
     quit_text = font.render('QUIT', True, WHITE)
 
@@ -308,10 +309,16 @@ def display_lose_screen():
         font.render("You lose!", True, WHITE),
         (500, 350),
     )
-    screen.blit(
-        font.render("You had no possible moves...", True, WHITE),
-        (500, 400),
-    )
+    if outrage:
+        screen.blit(
+            font.render("You angered the people, who removed you from power . . . ", True, WHITE),
+            (300, 400),
+        )
+    else:
+        screen.blit(
+            font.render("You had no possible moves...", True, WHITE),
+            (500, 400),
+        )
 
     while True:
         mouse = pygame.mouse.get_pos()
