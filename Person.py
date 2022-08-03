@@ -18,6 +18,7 @@ class Person:
         ret.turnsVaccinated = self.turnsVaccinated
         ret.isVaccinated = self.isVaccinated
         ret.wasCured = self.wasCured
+        ret.hasMed = self.hasMed
         return ret
 
     def get_bitten(self):

@@ -95,9 +95,10 @@ while running:
                     elif action == "ai turn":
                         #pick the AI move
                         #best_child = root_node.best_action() #find the best child of the root node
+                        #GameBoard.med()
                         AiThinking = True
                         BestAct = root_node.best_action().parent_action
-                        print(GameBoard.toCoord(BestAct[0].location), " to ", BestAct[2], "--------------------------")
+                        print(BestAct[1], " ", GameBoard.toCoord(BestAct[0].location), " towards ", BestAct[2], "--------------------------")
                         GameBoard = GameBoard.NodeMove(BestAct)
                         root_node = Node(GameBoard,None, None) # make root note
                         AiThinking = False
