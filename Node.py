@@ -34,7 +34,7 @@ class Node:
     
     def expand(self):
         start, action, direction, target = self.untried_actions.pop() #takes an action from untried actions
-        next_state = self.state.act[action](start, direction) #creates the state after that move happens
+        next_state = self.state.act[action](self.state.toCoord(start.location), direction) #creates the state after that move happens
         child_node = Node(next_state, parent=self, parent_action=(start, action, direction, target), age=self.age+1) #creates a node with that state and action as a child of this node
         self.children.append(child_node) #adds that node to the children of this node
         return child_node #returns the child node

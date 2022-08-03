@@ -184,7 +184,6 @@ class Board:
             new_coords = coords
         
         #self.States[self.toIndex(coords)].person.facing = Direction
-
         return new_coords
     
     def move(self, coords: Tuple[int, int], direction: Direction) -> Result:
