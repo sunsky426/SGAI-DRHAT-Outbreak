@@ -67,7 +67,7 @@ class Node:
 
     def _tree_policy(self): #branches every node
         current_node = self
-        while not current_node.is_terminal_node(): #while selected node is not the last node
+        while not current_node.is_terminal_node() and self.age < 7: #while selected node is not the last node
             if not current_node.is_fully_expanded(): # if the selected node hasnt been fully expanded, expand it
                 return current_node.expand()
             else:
