@@ -1,10 +1,12 @@
+from hashlib import new
 import pygame
 from Board import Board
+from Node import Node
 import PygameFunctions as PF
 import random as rd
 from constants import *
 import time
-from Node import Node
+from Node import *
 
 # Player role variables
 player_role = Role.government  # Valid options are Role.government and Role.zombie
@@ -33,6 +35,8 @@ start = False
 #Initial player score
 player_score = 0
 
+Data = [[[], [], [], [], [], []]] #[[kills], [heals], [meds], [zombies/population], [anxiety], [outrage]]
+Turn = 0
 
 while running:
     #displays the main menu until user hits start or quit
@@ -41,12 +45,13 @@ while running:
             start = PF.disp_title_screen()
         #Throws exception when user quits program using in-game button
         except pygame.error:
+            print("Data: ", Data)
             print("Game closed by user")
             break
     elif start == True:
         P = PF.run(GameBoard)
         if SELF_PLAY:
-            if(
+            if( #if the game is over
                 not GameBoard.containsPerson(bool(player_role.value))
                 or GameBoard.outrage >= 100
             ):
@@ -57,15 +62,18 @@ while running:
                     state.safeSpace = False
                 GameBoard.populate()
                 start = False
+                Data.append([[], [], [], [], [], []])
+                Turn = 0   
                 continue
             # Event Handling
             for event in P:
                 if event.type == pygame.MOUSEBUTTONUP:
                     x, y = pygame.mouse.get_pos()
                     action = PF.get_action(GameBoard, x, y)
-
+                    print(action)
                     if(action == "Distrb Med"):
                         take_action.append("Distrb Med")
+                        Data[-1][2].append(Turn)
                         time.sleep(0.1)
                         GameBoard.med()
                         take_action = []
@@ -122,7 +130,13 @@ while running:
                     if result == Result.success:
                         player_score += PF.get_reward(take_action[0])
                         #if it succeeds, the player gets a reward corresponding to their action
-                    
+                        if take_action[0] == Action.kill: #add to data
+                            Data[-1][0].append(Turn)
+                        elif take_action[0] == Action.heal:
+                            Data[-1][1].append(Turn)
+                        Data[-1][3].append(round(GameBoard.num_zombies()/GameBoard.population, 2))
+                        Data[-1][4].append(GameBoard.anxiety)
+                        Data[-1][5].append(GameBoard.outrage)
                     if result != Result.invalid:
                         playerMoved = True
                     take_action = []
@@ -130,6 +144,8 @@ while running:
             PF.screen.blit(font.render("Score: " + str(player_score), True, PF.WHITE),(900,500))
 
             if playerMoved:
+                Turn+=1
+
                 # Intermission
                 PF.run(GameBoard)
                 pygame.display.update()
@@ -268,4 +284,29 @@ while running:
                     print("loseCase")
                 if event.type == pygame.QUIT:
                     running = False
+Data = Data[0:-1]
+print("Data: ", Data)
 pygame.display.quit()
+
+
+
+
+
+
+
+
+def play_game(state):
+    
+    best_childs = []
+    root_node = Node(state,None, None) # make root note
+    root_node.untried_actions() #initialize list of untried actions for root node
+    best_child = root_node.best_action() #find the best child of the root node
+    best_childs.append(best_child)
+
+    parent = best_child  # update parent node
+
+    while not parent.is_terminal_node():
+        best_child = parent.best_action() #find the best child of the parent node
+        best_childs.append(best_child) #stick it onto the list
+        parent = best_child # update parent 
+    return best_childs  # get list of all the best moves to take

@@ -5,7 +5,6 @@ from constants import Direction
 
 class Person:
     def __init__(self, iz: bool):
-        self.facing = Direction.up
         self.isZombie = iz
         self.wasVaccinated = False
         self.turnsVaccinated = 0
