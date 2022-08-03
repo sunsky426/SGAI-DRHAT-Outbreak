@@ -87,7 +87,9 @@ while running:
 
                     elif action == "reset move":
                         take_action = []
-                        
+                    elif action == "ai turn":
+                        #take_action.append(playNode.best_action())
+                        print("test line")
                     elif type(action) is tuple:
                         idx = GameBoard.toIndex(action)
                         # action is a coordinate
