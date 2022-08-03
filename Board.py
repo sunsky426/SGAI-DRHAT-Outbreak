@@ -271,8 +271,9 @@ class Board:
     
     def NodeMove(self, action): #action is (start, action, target, direction)
         newBoard = self.clone(self.States, self.player_role)
-        newBoard.act(action[1])
-        return newBoard.act(action[0], action[3])
+        newBoard.act[action[1]](action[0], action[3])
+        return newBoard
+
 
     def bite(self, coords: Tuple[int, int], direction: Direction) -> Result:
         target_coords = self.getTargetCoords(coords, direction)
