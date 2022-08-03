@@ -3,7 +3,7 @@ import numpy as np
 from collections import defaultdict
 from Board import Board
 from constants import *
-
+import time
 
 class Node:
     def __init__(self, state: Board, parent=None, parent_action=None, age = 0):
@@ -42,15 +42,16 @@ class Node:
         return child_node #returns the child node
     
     def is_terminal_node(self): #checks if this is the last node in the branch
-        return self.game_ended() or self.age>3
+        return self.state.game_ended() or self.age > 3
 
     def rollout(self):
         current_rollout_state = self.state 
-        while not current_rollout_state.game_ended(): #while the node is not a terminal node
+        while not current_rollout_state.game_ended: #while the board is not an end board
             possible_moves = current_rollout_state.get_legal_actions() #get all moves from this node
             action = self.rollout_policy(possible_moves) #select a move using the rollout policy (random by default)
             print(self.age, " -")
             current_rollout_state = current_rollout_state.NodeMove(action) #change the node to the state after said action is made
+        
         return current_rollout_state.game_result() #loop the above until the game ends, then return the game result
     
     def backpropagate(self, result): #send the information from the node back to the root
@@ -83,10 +84,11 @@ class Node:
         for i in range(simulation_no): #creates simulations
             v = self._tree_policy() #makes all the nodes
             reward = v.rollout() #does the moves for all the nodes
+            print(reward)
             v.backpropagate(reward) #send all the info back to the root
         return self.best_child(c_param=0.) #return the best node for the root to choose
 
-    def game_result(self, board):
+    def game_result(self):
         """
         Should return a reward value based on the result of the game
         Either a positive value when humans win, based on how many people remain, or a negative value when zombies win
@@ -94,7 +96,7 @@ class Node:
         reward = 0
         if self.game_ended():
             # checks if the game has ended before returning a reward value other than 0
-            for s in board.States:
+            for s in self.States:
                 # this code has been written based on the assumption that that the state will be defined as Gameboard.states
                 if s.person == True and s.person.isZombie == False:
                     reward += 1

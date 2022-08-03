@@ -5,7 +5,7 @@ from typing import List, Tuple
 from constants import *
 import pygame
 pygame.mixer.init()
-
+import time
 
 class Board:
     #initializing variables
@@ -148,6 +148,20 @@ class Board:
     def game_ended(self):
         return self.num_zombies() == self.population or self.num_zombies() == 0 or self.outrage >= 100
     
+    def game_result(self):
+        if self.game_ended():
+            # checks if the game has ended before returning a reward value other than 0
+            reward = 0
+            for s in self.States:
+                # this code has been written based on the assumption that that the state will be defined as Gameboard.states
+                if s.person == True and s.person.isZombie == False:
+                    reward += 1
+            if reward == 0:
+                # returns a basic value of -10 whenever the zombies win, can be changed later
+                reward = -1000
+            return reward
+        return (self.population - self.num_zombies())- 0.9*self.num_zombies() - 0.05 * self.outrage
+
     def isAdjacentTo(self, coord: Tuple[int, int], is_zombie: bool) -> bool: # returns adjacent coordinates containing the same type (so person if person etc)
 
         ret = False
@@ -277,7 +291,8 @@ class Board:
             return d
     
     def NodeMove(self, action): #action is (start, action, target, direction)
-        print("NEW NODE MADE")
+        print(self.toCoord(action[0].location), " to ", action[2])
+        time.sleep(0.1)
         newBoard = self.clone(self.States, self.player_role)
         newBoard.act[action[1]](self.toCoord(action[0].location), action[3])
         return newBoard
@@ -692,5 +707,6 @@ class Board:
                             if not result == Result.invalid:
                                 #if valid, add the action to the list
                                 legal_actions.append((state, Action.bite, target, direction))
-                                
+        
+        print("penis -------------------------------------------------------------------------------")
         return legal_actions
