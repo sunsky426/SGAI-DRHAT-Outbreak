@@ -40,11 +40,11 @@ class Node:
         return child_node #returns the child node
     
     def is_terminal_node(self): #checks if this is the last node in the branch
-        return self.state.is_game_over()
+        return self.game_ended()
 
     def rollout(self):
         current_rollout_state = self.state 
-        while not current_rollout_state.is_game_over(): #while the node is not a terminal node
+        while not current_rollout_state.game_ended(): #while the node is not a terminal node
             possible_moves = current_rollout_state.get_legal_actions() #get all moves from this node
             action = self.rollout_policy(possible_moves) #select a move using the rollout policy (random by default)
             current_rollout_state = current_rollout_state.NodeMove(action) #change the node to the state after said action is made

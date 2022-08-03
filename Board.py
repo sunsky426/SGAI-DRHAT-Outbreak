@@ -145,6 +145,8 @@ class Board:
         NB.player_role = role
         return NB
 
+    def gameEnded():
+        return num_zombies() == population or num_zombies() == 0
     def isAdjacentTo(self, coord: Tuple[int, int], is_zombie: bool) -> bool: # returns adjacent coordinates containing the same type (so person if person etc)
 
         ret = False
@@ -188,7 +190,7 @@ class Board:
     def move(self, coords: Tuple[int, int], direction: Direction) -> Result:
         new_coords = self.getTargetCoords(coords, direction)
         if direction == Direction.self: return Result.invalid
-        if not self.isValidCoordinate(new_coords): return Result.invalid
+        if not self.isValidCoordinate(new_coords) or not self.isValidCoordinate(coords): return Result.invalid
         
         # Get the start and destination index (1D)
         start_idx = self.toIndex(coords)
@@ -278,7 +280,7 @@ class Board:
     def bite(self, coords: Tuple[int, int], direction: Direction) -> Result:
         target_coords = self.getTargetCoords(coords, direction)
         if direction == Direction.self: return Result.invalid
-        if not self.isValidCoordinate(target_coords): return Result.invalid
+        if not self.isValidCoordinate(target_coords) or not self.isValidCoordinate(coords): return Result.invalid
         
         # Get the start and destination index (1D)
         start_idx = self.toIndex(coords)
@@ -510,17 +512,19 @@ class Board:
     def move_validity(self, coords: Tuple[int, int], direction: Direction) -> Result:
         new_coords = self.getTargetCoords(coords, direction)
         if direction == Direction.self: return Result.invalid
-        if not self.isValidCoordinate(new_coords): return Result.invalid
+        if not self.isValidCoordinate(new_coords) or not self.isValidCoordinate(coords): return Result.invalid
         
         # Get the start and destination index (1D)
         start_idx = self.toIndex(coords)
         destination_idx = self.toIndex(new_coords)
 
+        print(start_idx, " ", destination_idx)
         # Check if the new coordinates are valid
         if not self.isValidCoordinate(new_coords):
             return Result.invalid
         if(
-            self.States[start_idx].person.isZombie
+            self.States[start_idx].person is not None 
+            and self.States[start_idx].person.isZombie
             and self.States[destination_idx].safeSpace
         ):
             return Result.invalid
@@ -532,7 +536,7 @@ class Board:
 
     def heal_validity(self, coords: Tuple[int, int], direction: Direction) -> Result:
         target_coords = self.getTargetCoords(coords, direction)
-        if not self.isValidCoordinate(target_coords): return Result.invalid
+        if not self.isValidCoordinate(target_coords) or not self.isValidCoordinate(coords): return Result.invalid
         
         # Get the start and destination index (1D)
         start_idx = self.toIndex(coords)
@@ -568,7 +572,7 @@ class Board:
     def kill_validity(self, coords: Tuple[int, int], direction: Direction) -> Result:
         target_coords = self.getTargetCoords(coords, direction)
         if direction == Direction.self: return Result.invalid
-        if not self.isValidCoordinate(target_coords): return Result.invalid
+        if not self.isValidCoordinate(target_coords) or not self.isValidCoordinate(coords): return Result.invalid
         
         # Get the start and destination index (1D)
         start_idx = self.toIndex(coords)
@@ -593,7 +597,7 @@ class Board:
     def bite_validity(self, coords: Tuple[int, int], direction: Direction) -> Result:
         target_coords = self.getTargetCoords(coords, direction)
         if direction == Direction.self: return Result.invalid
-        if not self.isValidCoordinate(target_coords): return Result.invalid
+        if not self.isValidCoordinate(target_coords) or not self.isValidCoordinate(coords): return Result.invalid
         
         # Get the start and destination index (1D)
         start_idx = self.toIndex(coords)
