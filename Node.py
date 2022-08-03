@@ -179,3 +179,15 @@ class Node:
                                 legal_actions.append((state, Action.bite, direction, target))
                                 
         return legal_actions
+
+    def board_eval(self):
+        zombie_count = 0
+        human_count = 0
+        for state in self.state.States:
+            if state.person is not None:
+                if state.person.isZombie:
+                    zombie_count += 1
+                else:
+                    human_count += 1
+            
+        return human_count- 0.9*zombie_count - 0.05 * self.state.outrage
