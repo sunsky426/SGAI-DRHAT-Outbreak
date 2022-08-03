@@ -5,7 +5,7 @@ from constants import *
 
 
 class Node:
-    def __init__(self, state: Board, parent=None, parent_action=None):
+    def __init__(self, state: Board, parent=None, parent_action=None, age = 0):
         self.state = state  # the board state
         self.parent = parent # whatever node this node came from, root node has no parent
         self.parent_action = parent_action  # action which parent carried out, root node is none again
@@ -16,6 +16,7 @@ class Node:
         self.results[-1] = 0  # starts with 0 losses
         self.untried_actions = None #all possible actions
         self.untried_actions = self.untried_actions()
+        self.age = age
         return
 
     def untried_actions(self): #starts with all possible actions, then is shrunk later in the expand function
@@ -110,7 +111,7 @@ class Node:
         """
         if not self.game_ended():  # if this node isnt a terminal node
             for i in self.untried_actions:  # looking through neighboring states and creating nodes off of that
-                c = Node(i, self, self.state)  # make da node
+                c = Node(i, self, self.state, self.age + 1)  # make da node
                 self.children.append(c)  # add child to list
         return self.children  # return list of children (idk if return statement is needed)
 
