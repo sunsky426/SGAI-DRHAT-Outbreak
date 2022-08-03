@@ -79,9 +79,9 @@ class Node:
     def best_action(self): #pretty self explanatory
         simulation_no = 100  
         for i in range(simulation_no): #creates simulations
-            v = self._tree_policy() #makes all the nodes
-            reward = v.rollout() #does the moves for all the nodes
-            v.backpropagate(reward) #send all the info back to the root
+            v = self._tree_policy() #selection & expansion
+            reward = v.rollout() #simulation
+            v.backpropagate(reward) #backprop
         return self.best_child(c_param=0.) #return the best node for the root to choose
 
     def game_result(self, board):
