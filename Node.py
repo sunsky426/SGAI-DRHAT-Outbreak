@@ -1,3 +1,4 @@
+from sys import setdlopenflags
 import numpy as np
 from collections import defaultdict
 from Board import Board
@@ -34,7 +35,7 @@ class Node:
     def expand(self):
         start, action, direction, target = self.untried_actions.pop() #takes an action from untried actions
         next_state = self.state.act[action](start, direction) #creates the state after that move happens
-        child_node = Node(next_state, parent=self, parent_action=(start, action, direction, target)) #creates a node with that state and action as a child of this node
+        child_node = Node(next_state, parent=self, parent_action=(start, action, direction, target), age=self.age+1) #creates a node with that state and action as a child of this node
         self.children.append(child_node) #adds that node to the children of this node
         return child_node #returns the child node
     
@@ -112,71 +113,6 @@ class Node:
         """
         if not self.game_ended():  # if this node isnt a terminal node
             for i in self.untried_actions:  # looking through neighboring states and creating nodes off of that
-                c = Node(i, self, self.state, self.age + 1)  # make da node
+                c = Node(i, self, self.state, age = self.age + 1)  # make da node
                 self.children.append(c)  # add child to list
         return self.children  # return list of children (idk if return statement is needed)
-
-
-
-    def get_legal_actions(self, GameBoard): 
-        legal_actions = [] 
-        actors = []
-
-        #based on role, get positions of all actors 
-        # and define possible actions
-        if GameBoard.player_role == Role.government:
-            actors = self.get_possible_states(1)
-            possible_actions = [Action.move, Action.heal, Action.kill]
-        elif GameBoard.player_role == Role.zombie:
-            actors = self.get_possible_states(-1)
-            possible_actions = [Action.move, Action.bite]
- 
-        possible_directions = [member for name, member in Direction]
-
-        #iterate through all states on board
-        for state in GameBoard.States:
-
-            if state.person != None:
-                #get adjacent squares
-                move_space = state.adjacent(GameBoard)
-                if (GameBoard.player_role == Role.government 
-                    and not state.person.isZombie):
-
-                    #attempt to move into valid squares, see if it works
-                    for target in move_space:
-                        for direction in possible_directions:
-                            result = GameBoard.move_validity(target, direction)
-                            if not result == Result.invalid:
-                                #if valid, add the action to the list
-                                legal_actions.append((state, Action.move, direction, target))
-
-                            #repeat, but with healing
-                            result = GameBoard.heal_validity(target, direction)
-                            if not result == Result.invalid:
-                                #if valid, add the action to the list
-                                legal_actions.append((state, Action.heal, direction, target))
-                        
-                            #repeat, but with killing
-                            result = GameBoard.heal_validity(target, direction)
-                            if not result == Result.invalid:
-                                #if valid, add the action to the list
-                                legal_actions.append((state, Action.kill, direction, target))
-
-                if (GameBoard.player_role == Role.zombie 
-                    and state.person.isZombie):
-
-                    #attempt to move into valid squares, see if it works
-                    for target in move_space:
-                        for direction in possible_directions:
-                            result = GameBoard.move_validity(target, direction)
-                            if not result == Result.invalid:
-                                #if valid, add the action to the list
-                                legal_actions.append((state, Action.move, direction, target))
-
-                            #repeat, but with biting
-                            result = GameBoard.bite_validity(target, direction)
-                            if not result == Result.invalid:
-                                #if valid, add the action to the list
-                                legal_actions.append((state, Action.bite, direction, target))
-                                
-        return legal_actions

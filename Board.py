@@ -613,3 +613,66 @@ class Board:
         ):
             return Result.invalid
         return Result.success
+    
+    def get_legal_actions(self): 
+        legal_actions = [] 
+        actors = []
+
+        #based on role, get positions of all actors 
+        # and define possible actions
+        if self.player_role == Role.government:
+            actors = self.get_possible_states(1)
+            possible_actions = [Action.move, Action.heal, Action.kill]
+        elif self.player_role == Role.zombie:
+            actors = self.get_possible_states(-1)
+            possible_actions = [Action.move, Action.bite]
+ 
+        possible_directions = [member for name, member in Direction]
+
+        #iterate through all states on board
+        for state in self.States:
+
+            if state.person != None:
+                #get adjacent squares
+                move_space = state.adjacent(self)
+                if (self.player_role == Role.government 
+                    and not state.person.isZombie):
+
+                    #attempt to move into valid squares, see if it works
+                    for target in move_space:
+                        for direction in possible_directions:
+                            result = self.move_validity(target, direction)
+                            if not result == Result.invalid:
+                                #if valid, add the action to the list
+                                legal_actions.append((state, Action.move, direction, target))
+
+                            #repeat, but with healing
+                            result = self.heal_validity(target, direction)
+                            if not result == Result.invalid:
+                                #if valid, add the action to the list
+                                legal_actions.append((state, Action.heal, direction, target))
+                        
+                            #repeat, but with killing
+                            result = self.heal_validity(target, direction)
+                            if not result == Result.invalid:
+                                #if valid, add the action to the list
+                                legal_actions.append((state, Action.kill, direction, target))
+
+                if (self.player_role == Role.zombie 
+                    and state.person.isZombie):
+
+                    #attempt to move into valid squares, see if it works
+                    for target in move_space:
+                        for direction in possible_directions:
+                            result = self.move_validity(target, direction)
+                            if not result == Result.invalid:
+                                #if valid, add the action to the list
+                                legal_actions.append((state, Action.move, direction, target))
+
+                            #repeat, but with biting
+                            result = self.bite_validity(target, direction)
+                            if not result == Result.invalid:
+                                #if valid, add the action to the list
+                                legal_actions.append((state, Action.bite, direction, target))
+                                
+        return legal_actions
