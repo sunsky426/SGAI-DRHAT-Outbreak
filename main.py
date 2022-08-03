@@ -100,7 +100,7 @@ while running:
                         root_node = Node(GameBoard,None, None) # make root note
                         playerMoved = True
                         #root_node = best_child
-                        print("AI Moved")
+                        print("AI Moved:", BestAct)
                         
                     elif type(action) is tuple:
                         idx = GameBoard.toIndex(action)
