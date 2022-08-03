@@ -634,7 +634,7 @@ class Board:
             actors = self.get_possible_states(-1)
             possible_actions = [Action.move, Action.bite]
  
-        possible_directions = [member for name, member in Direction]
+        possible_directions = [Direction.up, Direction.down, Direction.left, Direction.right]
 
         #iterate through all states on board
         for state in self.States:
