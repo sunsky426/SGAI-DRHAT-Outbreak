@@ -32,6 +32,8 @@ start = False
 #Initial player score
 player_score = 0
 
+Data = [[[], [], [], [], [], []]] #[[kills], [heals], [meds], [zombies/population], [anxiety], [outrage]]
+Turn = 0
 
 while running:
     #displays the main menu until user hits start or quit
@@ -40,30 +42,34 @@ while running:
             start = PF.disp_title_screen()
         #Throws exception when user quits program using in-game button
         except pygame.error:
+            print("Data: ", Data)
             print("Game closed by user")
             break
     elif start == True:
         P = PF.run(GameBoard)
         if SELF_PLAY:
-            if(
+            if( #if the game is over
                 not GameBoard.containsPerson(bool(player_role.value))
                 or GameBoard.outrage >= 100
             ):
-                running = PF.display_lose_screen()
-                for state in GameBoard.States:
+                running = PF.display_lose_screen() #display the lose screen showing "play again" or "quit", if "play again" :
+                for state in GameBoard.States:   #reset the board
                     state.person = None
                     state.safeSpace = False
                 GameBoard.populate()
                 start = False
+                Data.append([[], [], [], [], [], []])
+                Turn = 0   
                 continue
             # Event Handling
             for event in P:
                 if event.type == pygame.MOUSEBUTTONUP:
                     x, y = pygame.mouse.get_pos()
                     action = PF.get_action(GameBoard, x, y)
-
+                    print(action)
                     if(action == "Distrb Med"):
                         take_action.append("Distrb Med")
+                        Data[-1][2].append(Turn)
                         time.sleep(0.1)
                         GameBoard.med()
                         take_action = []
@@ -113,13 +119,19 @@ while running:
                     GameBoard.anxiety += 1
                     directionToMove = PF.direction(take_action[1], take_action[2])
                     print("Implementing", take_action[0], "to", directionToMove)
-                    result = GameBoard.actionToFunction[take_action[0]](take_action[1], directionToMove)
+                    result = GameBoard.act[take_action[0]](take_action[1], directionToMove)
                     print(f"did it succeed? {result}")
 
                     if result == Result.success:
                         player_score += PF.get_reward(take_action[0])
                         #if it succeeds, the player gets a reward corresponding to their action
-                    
+                        if take_action[0] == Action.kill: #add to data
+                            Data[-1][0].append(Turn)
+                        elif take_action[0] == Action.heal:
+                            Data[-1][1].append(Turn)
+                        Data[-1][3].append(round(GameBoard.num_zombies()/GameBoard.population, 2))
+                        Data[-1][4].append(GameBoard.anxiety)
+                        Data[-1][5].append(GameBoard.outrage)
                     if result != Result.invalid:
                         playerMoved = True
                     take_action = []
@@ -127,6 +139,8 @@ while running:
             PF.screen.blit(font.render("Score: " + str(player_score), True, PF.WHITE),(900,500))
 
             if playerMoved:
+                Turn+=1
+
                 # Intermission
                 PF.run(GameBoard)
                 pygame.display.update()
@@ -180,7 +194,7 @@ while running:
                 # Implement the selected action
                 print("action chosen is", action)
                 print("move start coord is", move_coord)
-                print(GameBoard.actionToFunction[action](move_coord, direction))
+                print(GameBoard.act[action](move_coord, direction))
                 print("stopping")
 
         # Update the display
@@ -259,9 +273,11 @@ while running:
                 if len(poss) > 0:
                     r = rd.randint(0, len(poss) - 1)
                     a = poss[r]
-                    GameBoard.actionToFunction[ta](a)
+                    GameBoard.act[ta](a)
                 if GameBoard.num_zombies() == GameBoard.population:
                     print("loseCase")
                 if event.type == pygame.QUIT:
                     running = False
+Data = Data[0:-1]
+print("Data: ", Data)
 pygame.display.quit()
