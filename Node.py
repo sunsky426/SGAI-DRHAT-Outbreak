@@ -94,9 +94,10 @@ class Node:
                 # this code has been written based on the assumption that that the state will be defined as Gameboard.states
                 if s.person == True and s.person.isZombie == False:
                     reward += 1
-                else:
-                    # returns a basic value of -10 whenever the zombies win, can be changed later
-                    reward = -10
+                
+            if reward == 0:
+                # returns a basic value of -10 whenever the zombies win, can be changed later
+                reward = -10
         else:
             return self.board_eval()
         return reward
