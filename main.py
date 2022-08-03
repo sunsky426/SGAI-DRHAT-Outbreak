@@ -1,9 +1,12 @@
+from hashlib import new
 import pygame
 from Board import Board
+from Node import Node
 import PygameFunctions as PF
 import random as rd
 from constants import *
 import time
+from Node import *
 
 # Player role variables
 player_role = Role.government  # Valid options are Role.government and Role.zombie
@@ -282,3 +285,26 @@ while running:
 Data = Data[0:-1]
 print("Data: ", Data)
 pygame.display.quit()
+
+
+
+
+
+
+
+
+def play_game(state):
+    
+    best_childs = []
+    root_node = Node(state,None, None) # make root note
+    root_node.untried_actions() #initialize list of untried actions for root node
+    best_child = root_node.best_action() #find the best child of the root node
+    best_childs.append(best_child)
+
+    parent = best_child  # update parent node
+
+    while not parent.is_terminal_node():
+        best_child = parent.best_action() #find the best child of the parent node
+        best_childs.append(best_child) #stick it onto the list
+        parent = best_child # update parent 
+    return best_childs  # get list of all the best moves to take
