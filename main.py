@@ -112,10 +112,11 @@ while running:
             )
             PF.screen.blit(font.render(f"{take_action}", True, PF.WHITE), (800, 450))
 
-            
 
             # Action handling
             if len(take_action) > 2:
+                    #slightly increases anxiety every turn
+                    GameBoard.anxiety += 1
                     directionToMove = PF.direction(take_action[1], take_action[2])
                     print("Implementing", take_action[0], "to", directionToMove)
                     result = GameBoard.act[take_action[0]](take_action[1], directionToMove)

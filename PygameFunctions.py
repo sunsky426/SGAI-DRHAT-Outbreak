@@ -36,7 +36,7 @@ def get_action(GameBoard: Board, pixel_x: int, pixel_y: int):
 
     heal_bite_check = pixel_x >= 900 and pixel_x <= 1100 and pixel_y > 190 and pixel_y < 301
     kill_check = pixel_x >= 800 and pixel_x <= 900 and pixel_y > 199 and pixel_y < 301
-    Med_check = pixel_x >= 800 and pixel_x <= 900 and pixel_y > 301 and pixel_y < 401
+    Med_check = pixel_x >= 800 and pixel_x <= 900 and pixel_y > 306 and pixel_y < 406
     reset_move_check = (
         pixel_x >= RESET_MOVE_COORDS[0]
         and pixel_x <= RESET_MOVE_COORDS[0] + RESET_MOVE_DIMS[0]
