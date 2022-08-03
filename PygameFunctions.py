@@ -43,6 +43,7 @@ def get_action(GameBoard: Board, pixel_x: int, pixel_y: int):
         and pixel_y >= RESET_MOVE_COORDS[1]
         and pixel_y <= RESET_MOVE_COORDS[1] + RESET_MOVE_DIMS[1]
     )
+    ai_move_check = (pixel_x >= 800 and pixel_x <= 1000 and pixel_y >= 700 and pixel_y <= 750)
     board_x = int((pixel_x - 150) / 100)
     board_y = int((pixel_y - 150) / 100)
     move_check = (
@@ -66,6 +67,8 @@ def get_action(GameBoard: Board, pixel_x: int, pixel_y: int):
         return "reset move"
     elif move_check:
         return board_coords
+    elif ai_move_check:
+        return "ai turn"
     return None
 
 
@@ -86,6 +89,9 @@ def run(GameBoard: Board):
     #Draw the kill button slightly to the left of heal
     display_people(GameBoard)
     display_reset_move_button()
+    display_ai_move_button()
+    #screen.blit(font.render(f"public outrage: {int(GameBoard.outrage)} %", True, WHITE), (10, 10))
+    #screen.blit(font.render(f"public anxiety: {int(GameBoard.anxiety)} %", True, WHITE), (10, 40))
     disp_public_opinion(GameBoard)
     return pygame.event.get()
 
@@ -148,6 +154,11 @@ def display_reset_move_button():
     )
     pygame.draw.rect(screen, BLACK, rect)
     screen.blit(font.render("Reset move?", True, WHITE), RESET_MOVE_COORDS)
+
+def display_ai_move_button():
+    rect = pygame.Rect(800,700,200,50)
+    pygame.draw.rect(screen, BLACK, rect)
+    screen.blit(font.render("AI move", True, WHITE), (800, 700))
 
 
 def display_image(
