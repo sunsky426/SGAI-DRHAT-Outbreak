@@ -296,7 +296,7 @@ class Board:
         chance = 100
         target = self.States[target_idx].person
         if target.isVaccinated:
-            chance = 15
+            chance = 10
         elif target.wasVaccinated != target.wasCured:
             chance = 75
         elif target.wasVaccinated and target.wasCured:
