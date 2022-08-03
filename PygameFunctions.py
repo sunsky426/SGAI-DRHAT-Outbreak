@@ -33,43 +33,43 @@ def get_action(GameBoard: Board, pixel_x: int, pixel_y: int):
     Return None otherwise
     """
     # Check if the user clicked on the "heal" icon, return "heal" if so
+    if GameBoard.allowclicks:
+        heal_bite_check = pixel_x >= 900 and pixel_x <= 1100 and pixel_y > 190 and pixel_y < 301
+        kill_check = pixel_x >= 800 and pixel_x <= 900 and pixel_y > 199 and pixel_y < 301
+        Med_check = pixel_x >= 800 and pixel_x <= 900 and pixel_y > 301 and pixel_y < 401
+        reset_move_check = (
+            pixel_x >= RESET_MOVE_COORDS[0]
+            and pixel_x <= RESET_MOVE_COORDS[0] + RESET_MOVE_DIMS[0]
+            and pixel_y >= RESET_MOVE_COORDS[1]
+            and pixel_y <= RESET_MOVE_COORDS[1] + RESET_MOVE_DIMS[1]
+        )
+        ai_move_check = (pixel_x >= 800 and pixel_x <= 1000 and pixel_y >= 700 and pixel_y <= 750)
+        board_x = int((pixel_x - 150) / 100)
+        board_y = int((pixel_y - 150) / 100)
+        move_check = (
+            board_x >= 0
+            and board_x < GameBoard.columns
+            and board_y >= 0
+            and board_y < GameBoard.rows
+        )
+        board_coords = (int((pixel_x - 150) / 100), int((pixel_y - 150) / 100))
 
-    heal_bite_check = pixel_x >= 900 and pixel_x <= 1100 and pixel_y > 190 and pixel_y < 301
-    kill_check = pixel_x >= 800 and pixel_x <= 900 and pixel_y > 199 and pixel_y < 301
-    Med_check = pixel_x >= 800 and pixel_x <= 900 and pixel_y > 301 and pixel_y < 401
-    reset_move_check = (
-        pixel_x >= RESET_MOVE_COORDS[0]
-        and pixel_x <= RESET_MOVE_COORDS[0] + RESET_MOVE_DIMS[0]
-        and pixel_y >= RESET_MOVE_COORDS[1]
-        and pixel_y <= RESET_MOVE_COORDS[1] + RESET_MOVE_DIMS[1]
-    )
-    ai_move_check = (pixel_x >= 800 and pixel_x <= 1000 and pixel_y >= 700 and pixel_y <= 750)
-    board_x = int((pixel_x - 150) / 100)
-    board_y = int((pixel_y - 150) / 100)
-    move_check = (
-        board_x >= 0
-        and board_x < GameBoard.columns
-        and board_y >= 0
-        and board_y < GameBoard.rows
-    )
-    board_coords = (int((pixel_x - 150) / 100), int((pixel_y - 150) / 100))
-
-    if heal_bite_check:
-        if GameBoard.player_role == Role.government:
-            return Action.heal
-        else:
-            return Action.bite
-    elif Med_check:
-        return "Distrb Med"
-    elif kill_check:
-        return Action.kill
-    elif reset_move_check:
-        return "reset move"
-    elif move_check:
-        return board_coords
-    elif ai_move_check:
-        return "ai turn"
-    return None
+        if heal_bite_check:
+            if GameBoard.player_role == Role.government:
+                return Action.heal
+            else:
+                return Action.bite
+        elif Med_check:
+            return "Distrb Med"
+        elif kill_check:
+            return Action.kill
+        elif reset_move_check:
+            return "reset move"
+        elif move_check:
+            return board_coords
+        elif ai_move_check:
+            return "ai turn"
+        return None
 
 
 def run(GameBoard: Board):

@@ -18,7 +18,8 @@ class Board:
     ):
         self.outrage = 0
         self.anxiety = 0
-
+        #Can be toggled on and off to allow the user to click
+        self.allowclicks = True
         self.rows = dimensions[0]
         self.columns = dimensions[1]
         self.display_border = border
@@ -708,5 +709,5 @@ class Board:
                                 #if valid, add the action to the list
                                 legal_actions.append((state, Action.bite, target, direction))
         
-        print("penis -------------------------------------------------------------------------------")
+        print("-------------------------------------------------------------------------------")
         return legal_actions

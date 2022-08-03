@@ -73,7 +73,6 @@ while running:
                 if event.type == pygame.MOUSEBUTTONUP:
                     x, y = pygame.mouse.get_pos()
                     action = PF.get_action(GameBoard, x, y)
-                    print(action)
                     if(action == "Distrb Med"):
                         take_action.append("Distrb Med")
                         Data[-1][2].append(Turn)
@@ -93,10 +92,12 @@ while running:
                     elif action == "ai turn":
                         #pick the AI move
                         #best_child = root_node.best_action() #find the best child of the root node
+                        GameBoard.allowclicks = False
                         GameBoard = root_node.best_action().state
                         root_node = Node(GameBoard,None, None) # make root note
                         #root_node = best_child
                         print("AI Moved")
+                        clicking = True
                         
                     elif type(action) is tuple:
                         idx = GameBoard.toIndex(action)
