@@ -40,7 +40,7 @@ class State:
 
     def adjacent(self, GameBoard):  # returns the four adjacent boxes that are in bounds
         newCoord = GameBoard.toCoord(self.location)
-        print(newCoord)
+        #print(newCoord)
         moves = [  # puts all four adjacent locations into moves
             (newCoord[0], newCoord[1] - 1),
             (newCoord[0], newCoord[1] + 1),
