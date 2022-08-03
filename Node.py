@@ -81,6 +81,18 @@ class Node:
             v.backpropagate(reward) #send all the info back to the root
         return self.best_child(c_param=0.) #return the best node for the root to choose
 
+    def act(self, state, action, direction, board): # takes a state, the action, direction, and the board
+        target = board.getTargetCoords(state.location, direction) # determine target coords
+        if action == action.heal: # check for each action: heal, move, kill, bite
+            board.heal(state.location, direction) # complete action to add to board using prev state's location
+        elif action == action.move:
+            board.move(state.location, direction)
+        elif action == action.kill:
+            board.kill(state.location, direction)
+        elif action == action.bite:
+            board.bite(state.location, direction)
+        return board.States[board.toIndex(target)] # return state of the new coords
+
     def game_result(self, board):
         """
         Should return a reward value based on the result of the game
