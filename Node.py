@@ -18,7 +18,7 @@ class Node:
         #self.untried_actions = None #all possible actions
         self.untried_actions = self.untried_actions()
         self.age = age
-        print(age)
+        print("Age: ", age)
         return
 
     def untried_actions(self): #starts with all possible actions, then is shrunk later in the expand function
@@ -35,7 +35,7 @@ class Node:
     
     def expand(self):
         start, action, target, direction = self.untried_actions.pop() #takes an action from untried actions
-        print(self.age)
+        print("Age: ", self.age)
         next_state = self.state.NodeMove((start, action, target, direction)) #creates the state after that move happens
         child_node = Node(next_state, parent=self, parent_action=(start, action, target, direction), age=self.age+1) #creates a node with that state and action as a child of this node
         self.children.append(child_node) #adds that node to the children of this node
