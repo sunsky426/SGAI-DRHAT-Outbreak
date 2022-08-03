@@ -38,6 +38,25 @@ player_score = 0
 Data = [[[], [], [], [], [], []]] #[[kills], [heals], [meds], [zombies/population], [anxiety], [outrage]]
 Turn = 0
 
+
+def play_game(state):
+    
+    best_childs = []
+    root_node = Node(state,None, None) # make root note
+    root_node.untried_actions() #initialize list of untried actions for root node
+    best_child = root_node.best_action() #find the best child of the root node
+    best_childs.append(best_child)
+
+    parent = best_child  # update parent node
+
+    while not parent.is_terminal_node():
+        best_child = parent.best_action() #find the best child of the parent node
+        best_childs.append(best_child) #stick it onto the list
+        parent = best_child # update parent 
+    return best_childs  # get list of all the best moves to take
+
+
+
 while running:
     #displays the main menu until user hits start or quit
     if start == False:
@@ -294,19 +313,3 @@ pygame.display.quit()
 
 
 
-
-def play_game(state):
-    
-    best_childs = []
-    root_node = Node(state,None, None) # make root note
-    root_node.untried_actions() #initialize list of untried actions for root node
-    best_child = root_node.best_action() #find the best child of the root node
-    best_childs.append(best_child)
-
-    parent = best_child  # update parent node
-
-    while not parent.is_terminal_node():
-        best_child = parent.best_action() #find the best child of the parent node
-        best_childs.append(best_child) #stick it onto the list
-        parent = best_child # update parent 
-    return best_childs  # get list of all the best moves to take

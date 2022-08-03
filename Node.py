@@ -1,4 +1,3 @@
-from sys import setdlopenflags
 import numpy as np
 from collections import defaultdict
 from Board import Board
@@ -15,7 +14,7 @@ class Node:
         self.results = defaultdict(int) #has all the possible results of a game, but for ours its only win or lose, so 1 or -1
         self.results[1] = 0 #starts with 0 wins
         self.results[-1] = 0  # starts with 0 losses
-        self.untried_actions = None #all possible actions
+        #self.untried_actions = None #all possible actions
         self.untried_actions = self.untried_actions()
         self.age = age
         return

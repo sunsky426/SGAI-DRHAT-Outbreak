@@ -90,8 +90,8 @@ def run(GameBoard: Board):
     display_people(GameBoard)
     display_reset_move_button()
     display_ai_move_button()
-    screen.blit(font.render(f"public outrage: {int(GameBoard.outrage)} %", True, WHITE), (10, 10))
-    screen.blit(font.render(f"public anxiety: {int(GameBoard.anxiety)} %", True, WHITE), (10, 40))
+    #screen.blit(font.render(f"public outrage: {int(GameBoard.outrage)} %", True, WHITE), (10, 10))
+    #screen.blit(font.render(f"public anxiety: {int(GameBoard.anxiety)} %", True, WHITE), (10, 40))
     disp_public_opinion(GameBoard)
     return pygame.event.get()
 
