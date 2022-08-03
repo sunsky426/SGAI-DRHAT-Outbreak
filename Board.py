@@ -520,7 +520,7 @@ class Board:
         if not self.isValidCoordinate(new_coords):
             return Result.invalid
         if(
-            self.States[start_idx].person is not None and self.States[start_idx].person.isZombie
+            self.States[start_idx] is not None and self.States[start_idx].person is not None and self.States[start_idx].person.isZombie
             and self.States[destination_idx].safeSpace
         ):
             return Result.invalid
