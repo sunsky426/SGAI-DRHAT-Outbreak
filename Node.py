@@ -1,10 +1,11 @@
 import numpy as np
 from collections import defaultdict
 from Board import Board
+from constants import *
 
 
 class Node:
-    def __init__(self, state: Board, parent=None, parent_action=None):
+    def __init__(self, state: Board, parent=None, parent_action=None, age = 0):
         self.state = state  # the board state
         self.parent = parent # whatever node this node came from, root node has no parent
         self.parent_action = parent_action  # action which parent carried out, root node is none again
@@ -14,11 +15,11 @@ class Node:
         self.results[1] = 0 #starts with 0 wins
         self.results[-1] = 0  # starts with 0 losses
         self.untried_actions = None #all possible actions
-        self.untried_action()
-        self.gameRunning = True #added variable that says when the game is running
+        self.untried_actions = self.untried_actions()
+        self.age = age
         return
 
-    def untried_action(self): #starts with all possible actions, then is shrunk later in the expand function
+    def untried_actions(self): #starts with all possible actions, then is shrunk later in the expand function
         self.untried_actions = self.state.get_legal_actions()
         return self.untried_actions
 
@@ -66,7 +67,7 @@ class Node:
 
     def _tree_policy(self): #branches every node
         current_node = self
-        while not current_node.is_terminal_node(): #while selected node is not the last node
+        while not current_node.is_terminal_node() and self.age < 7: #while selected node is not the last node
             if not current_node.is_fully_expanded(): # if the selected node hasnt been fully expanded, expand it
                 return current_node.expand()
             else:
@@ -74,7 +75,7 @@ class Node:
         return current_node #in the end, return the best node of all of the children of this node, this is the mcts program basically
     
     def best_action(self): #pretty self explanatory
-        simulation_no = 100
+        simulation_no = 100  
         for i in range(simulation_no): #creates simulations
             v = self._tree_policy() #makes all the nodes
             reward = v.rollout() #does the moves for all the nodes
@@ -87,15 +88,18 @@ class Node:
         Either a positive value when humans win, based on how many people remain, or a negative value when zombies win
         """
         reward = 0
-        if not self.gameRunning:
+        if self.game_ended():
             # checks if the game has ended before returning a reward value other than 0
             for s in board.States:
                 # this code has been written based on the assumption that that the state will be defined as Gameboard.states
                 if s.person == True and s.person.isZombie == False:
                     reward += 1
-                else:
-                    # returns a basic value of -10 whenever the zombies win, can be changed later
-                    reward = -10
+                
+            if reward == 0:
+                # returns a basic value of -10 whenever the zombies win, can be changed later
+                reward = -10
+        else:
+            return self.board_eval()
         return reward
 
     def game_ended(self):
@@ -106,8 +110,73 @@ class Node:
         This is technically "move" but I may write another move function where the AI actually chooses a node,
         since this one just adds all the child nodes to the children array.
         """
-        if self.gameRunning:  # if this node isnt the terminal node
+        if not self.game_ended():  # if this node isnt a terminal node
             for i in self.untried_actions:  # looking through neighboring states and creating nodes off of that
-                c = Node(i, self, self.state)  # make da node
+                c = Node(i, self, self.state, self.age + 1)  # make da node
                 self.children.append(c)  # add child to list
         return self.children  # return list of children (idk if return statement is needed)
+
+
+
+    def get_legal_actions(self, GameBoard): 
+        legal_actions = [] 
+        actors = []
+
+        #based on role, get positions of all actors 
+        # and define possible actions
+        if GameBoard.player_role == Role.government:
+            actors = self.get_possible_states(1)
+            possible_actions = [Action.move, Action.heal, Action.kill]
+        elif GameBoard.player_role == Role.zombie:
+            actors = self.get_possible_states(-1)
+            possible_actions = [Action.move, Action.bite]
+ 
+        possible_directions = [member for name, member in Direction]
+
+        #iterate through all states on board
+        for state in GameBoard.States:
+
+            if state.person != None:
+                #get adjacent squares
+                move_space = state.adjacent(GameBoard)
+                if (GameBoard.player_role == Role.government 
+                    and not state.person.isZombie):
+
+                    #attempt to move into valid squares, see if it works
+                    for target in move_space:
+                        for direction in possible_directions:
+                            result = GameBoard.move_validity(target, direction)
+                            if not result == Result.invalid:
+                                #if valid, add the action to the list
+                                legal_actions.append((state, Action.move, direction, target))
+
+                            #repeat, but with healing
+                            result = GameBoard.heal_validity(target, direction)
+                            if not result == Result.invalid:
+                                #if valid, add the action to the list
+                                legal_actions.append((state, Action.heal, direction, target))
+                        
+                            #repeat, but with killing
+                            result = GameBoard.heal_validity(target, direction)
+                            if not result == Result.invalid:
+                                #if valid, add the action to the list
+                                legal_actions.append((state, Action.kill, direction, target))
+
+                if (GameBoard.player_role == Role.zombie 
+                    and state.person.isZombie):
+
+                    #attempt to move into valid squares, see if it works
+                    for target in move_space:
+                        for direction in possible_directions:
+                            result = GameBoard.move_validity(target, direction)
+                            if not result == Result.invalid:
+                                #if valid, add the action to the list
+                                legal_actions.append((state, Action.move, direction, target))
+
+                            #repeat, but with biting
+                            result = GameBoard.bite_validity(target, direction)
+                            if not result == Result.invalid:
+                                #if valid, add the action to the list
+                                legal_actions.append((state, Action.bite, direction, target))
+                                
+        return legal_actions
