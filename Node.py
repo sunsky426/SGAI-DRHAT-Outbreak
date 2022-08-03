@@ -71,7 +71,7 @@ class Node:
             if not current_node.is_fully_expanded(): # if the selected node hasnt been fully expanded, expand it
                 return current_node.expand()
             else:
-                current_node = current_node.best_child() #if it has been expanded, return the best node of the children
+                current_node = current_node.best_child() #if it has been expanded, return the image.pngbest node of the children
         return current_node #in the end, return the best node of all of the children of this node, this is the mcts program basically
     
     def best_action(self): #pretty self explanatory

@@ -74,7 +74,6 @@ while running:
                 not GameBoard.containsPerson(bool(player_role.value))
                 or GameBoard.outrage >= 100
             ):
-                #node.game_ended()
                 running = PF.display_lose_screen()
                 for state in GameBoard.States:
                     state.person = None
