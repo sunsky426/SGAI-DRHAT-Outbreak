@@ -97,7 +97,6 @@ while running:
                         root_node = Node(GameBoard,None, None) # make root note
                         #root_node = best_child
                         print("AI Moved")
-                        clicking = True
                         
                     elif type(action) is tuple:
                         idx = GameBoard.toIndex(action)

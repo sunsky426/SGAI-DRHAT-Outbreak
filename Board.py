@@ -292,7 +292,7 @@ class Board:
             return d
     
     def NodeMove(self, action): #action is (start, action, target, direction)
-        print(self.toCoord(action[0].location), " to ", action[2])
+        #print(self.toCoord(action[0].location), " to ", action[2])
         time.sleep(0.1)
         newBoard = self.clone(self.States, self.player_role)
         newBoard.act[action[1]](self.toCoord(action[0].location), action[3])
@@ -708,6 +708,7 @@ class Board:
                             if not result == Result.invalid:
                                 #if valid, add the action to the list
                                 legal_actions.append((state, Action.bite, target, direction))
+
         
         print("-------------------------------------------------------------------------------")
         return legal_actions

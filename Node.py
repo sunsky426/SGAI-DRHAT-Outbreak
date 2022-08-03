@@ -18,7 +18,7 @@ class Node:
         #self.untried_actions = None #all possible actions
         self.untried_actions = self.untried_actions()
         self.age = age
-        print(age)
+        #print("Age: ", age)
         return
 
     def untried_actions(self): #starts with all possible actions, then is shrunk later in the expand function
@@ -35,14 +35,14 @@ class Node:
     
     def expand(self):
         start, action, target, direction = self.untried_actions.pop() #takes an action from untried actions
-        print(self.age)
+        #print("Age: ", self.age)
         next_state = self.state.NodeMove((start, action, target, direction)) #creates the state after that move happens
         child_node = Node(next_state, parent=self, parent_action=(start, action, target, direction), age=self.age+1) #creates a node with that state and action as a child of this node
         self.children.append(child_node) #adds that node to the children of this node
         return child_node #returns the child node
     
     def is_terminal_node(self): #checks if this is the last node in the branch
-        return self.state.game_ended() or self.age > 3
+        return self.state.game_ended() or self.age > 5
 
     def rollout(self):
         current_rollout_state = self.state 
@@ -84,7 +84,7 @@ class Node:
         for i in range(simulation_no): #creates simulations
             v = self._tree_policy() #makes all the nodes
             reward = v.rollout() #does the moves for all the nodes
-            print(reward)
+            #print(reward)
             v.backpropagate(reward) #send all the info back to the root
         return self.best_child(c_param=0.) #return the best node for the root to choose
 
