@@ -197,7 +197,7 @@ class Board:
         destination_idx = self.toIndex(new_coords)
 
         # Check if the new coordinates are valid
-        if not self.isValidCoordinate(new_coords):
+        if not self.isValidCoordinate(new_coords) or not self.isValidCoordinate(coords):
             return Result.invalid
         if(
             self.States[start_idx].person.isZombie
@@ -523,6 +523,7 @@ class Board:
         if not self.isValidCoordinate(new_coords):
             return Result.invalid
         if(
+            self.States[start_idx] is not None
             self.States[start_idx].person is not None 
             and self.States[start_idx].person.isZombie
             and self.States[destination_idx].safeSpace
