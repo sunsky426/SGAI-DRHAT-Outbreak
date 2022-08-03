@@ -447,7 +447,7 @@ class Board:
 
         # Execute Kill
         self.States[target_idx].person = None
-        KILL_SOUND.play()
+        #KILL_SOUND.play()
         self.outrage += 0.5 * (100 - self.anxiety)
         self.population -= 1
         return Result.success

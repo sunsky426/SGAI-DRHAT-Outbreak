@@ -214,12 +214,10 @@ while running:
                 move_coord = rd.choice(possible_move_coords)
 
                 # Implement the selected action
-                '''
-                print("action chosen is", action)
-                print("move start coord is", move_coord)
+                print(action,  move_coord, direction)
                 print(GameBoard.act[action](move_coord, direction))
                 print("stopping")
-                '''
+                
 
         # Update the display
         pygame.display.update()
