@@ -356,14 +356,19 @@ def get_reward(action):
     elif action == Action.bite:
         return -100
 
-def direction(coord1: Tuple[int, int], coord2: Tuple[int, int]):    
-    if coord1 == coord2:
+def direction(coord1: Tuple[int, int], coord2: Tuple[int, int]):
+    vert_diff = coord2[1] - coord1[1]
+    horz_diff = coord2[0] - coord1[0]
+    print(vert_diff, horz_diff, "diff")
+    if coord2 == coord1:
         return Direction.self
-    elif coord2[1] > coord1[1]:
-        return Direction.down
-    elif coord2[1] < coord1[1]:
-        return Direction.up
-    elif coord2[0] > coord1[0]:
-        return Direction.right
-    elif coord2[0] < coord1[0]:
-        return Direction.left
+    elif vert_diff**2 > horz_diff**2:
+        if vert_diff > 0:
+            return Direction.down
+        else:
+            return Direction.up
+    else:
+        if horz_diff > 0:
+            return Direction.right
+        else:
+            return Direction.left
