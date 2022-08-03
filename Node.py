@@ -14,7 +14,7 @@ class Node:
         self.results = defaultdict(int) #has all the possible results of a game, but for ours its only win or lose, so 1 or -1
         self.results[1] = 0 #starts with 0 wins
         self.results[-1] = 0  # starts with 0 losses
-        self.untried_actions = None #all possible actions
+        #self.untried_actions = None #all possible actions
         self.untried_actions = self.untried_actions()
         self.age = age
         return
@@ -115,3 +115,15 @@ class Node:
                 c = Node(i, self, self.state, age = self.age + 1)  # make da node
                 self.children.append(c)  # add child to list
         return self.children  # return list of children (idk if return statement is needed)
+
+    def board_eval(self):
+        zombie_count = 0
+        human_count = 0
+        for state in self.state.States:
+            if state.person is not None:
+                if state.person.isZombie:
+                    zombie_count += 1
+                else:
+                    human_count += 1
+            
+        return (human_count- 0.9*zombie_count - 0.05 * self.state.outrage)
