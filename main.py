@@ -92,8 +92,11 @@ while running:
                     elif action == "ai turn":
                         #pick the AI move
                         #best_child = root_node.best_action() #find the best child of the root node
-                        GameBoard.allowclicks = False
-                        GameBoard = root_node.best_action().state
+                        #GameBoard.med()
+                        AiThinking = True
+                        BestAct = root_node.best_action().parent_action
+                        print(BestAct[1], " ", GameBoard.toCoord(BestAct[0].location), " towards ", BestAct[2], "--------------------------")
+                        GameBoard = GameBoard.NodeMove(BestAct)
                         root_node = Node(GameBoard,None, None) # make root note
                         #root_node = best_child
                         print("AI Moved")
@@ -244,9 +247,10 @@ while running:
                 move_coord = rd.choice(possible_act_coords)
 
                 # Implement the selected action
-                print(action, direction, move_coord)
+                print(action,  move_coord, direction)
                 print(GameBoard.act[action](move_coord, direction))
                 print("stopping")
+                
 
         # Update the display
         pygame.display.update()
