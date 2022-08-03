@@ -707,4 +707,6 @@ class Board:
                             if not result == Result.invalid:
                                 #if valid, add the action to the list
                                 legal_actions.append((state, Action.bite, target, direction))
+
+        #print(legal_actions)
         return legal_actions

@@ -97,12 +97,13 @@ while running:
                         #best_child = root_node.best_action() #find the best child of the root node
                         AiThinking = True
                         BestAct = root_node.best_action().parent_action
+                        print(GameBoard.toCoord(BestAct[0].location), " to ", BestAct[2], "--------------------------")
                         GameBoard = GameBoard.NodeMove(BestAct)
                         root_node = Node(GameBoard,None, None) # make root note
                         AiThinking = False
                         playerMoved = True
                         #root_node = best_child
-                        print("AI Moved\nMove: ", BestAct[1])
+                        #print("AI Moved\nMove: ", BestAct[1])
                         
                     elif type(action) is tuple:
                         idx = GameBoard.toIndex(action)
@@ -212,10 +213,12 @@ while running:
                 move_coord = rd.choice(possible_move_coords)
 
                 # Implement the selected action
+                '''
                 print("action chosen is", action)
                 print("move start coord is", move_coord)
                 print(GameBoard.act[action](move_coord, direction))
                 print("stopping")
+                '''
 
         # Update the display
         pygame.display.update()
