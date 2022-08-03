@@ -35,19 +35,21 @@ class Node:
     
     def expand(self):
         start, action, target, direction = self.untried_actions.pop() #takes an action from untried actions
+        print(self.age)
         next_state = self.state.NodeMove((start, action, target, direction)) #creates the state after that move happens
         child_node = Node(next_state, parent=self, parent_action=(start, action, target, direction), age=self.age+1) #creates a node with that state and action as a child of this node
         self.children.append(child_node) #adds that node to the children of this node
         return child_node #returns the child node
     
     def is_terminal_node(self): #checks if this is the last node in the branch
-        return self.game_ended()
+        return self.game_ended() or self.age>3
 
     def rollout(self):
         current_rollout_state = self.state 
         while not current_rollout_state.game_ended(): #while the node is not a terminal node
             possible_moves = current_rollout_state.get_legal_actions() #get all moves from this node
             action = self.rollout_policy(possible_moves) #select a move using the rollout policy (random by default)
+            print(self.age, " -")
             current_rollout_state = current_rollout_state.NodeMove(action) #change the node to the state after said action is made
         return current_rollout_state.game_result() #loop the above until the game ends, then return the game result
     
@@ -69,7 +71,7 @@ class Node:
 
     def _tree_policy(self): #branches every node
         current_node = self
-        while not current_node.is_terminal_node() and self.age < 3: #while selected node is not the last node
+        while not current_node.is_terminal_node(): #while selected node is not the last node
             if not current_node.is_fully_expanded(): # if the selected node hasnt been fully expanded, expand it
                 return current_node.expand()
             else:

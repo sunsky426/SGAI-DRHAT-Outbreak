@@ -171,19 +171,19 @@ class Board:
     def getTargetCoords(self, coords: Tuple[int, int], direction: Direction) -> Tuple[int, int]:
         if direction == Direction.up:
             new_coords = (coords[0], coords[1] - 1)
-            print(f"going from {coords} to new coords {new_coords}")
+            #print(f"going from {coords} to new coords {new_coords}")
             return (coords[0], coords[1] - 1)
         elif direction == Direction.down:
             new_coords = (coords[0], coords[1] + 1)
-            print(f"going from {coords} to new coords {new_coords}")
+            #print(f"going from {coords} to new coords {new_coords}")
             return (coords[0], coords[1] + 1)
         elif direction == Direction.left:
             new_coords = (coords[0] - 1, coords[1])
-            print(f"going from {coords} to new coords {new_coords}")
+            #print(f"going from {coords} to new coords {new_coords}")
             return (coords[0] - 1, coords[1])
         elif direction == Direction.right:
             new_coords = (coords[0] + 1, coords[1])
-            print(f"going from {coords} to new coords {new_coords}")
+            #print(f"going from {coords} to new coords {new_coords}")
             return (coords[0] + 1, coords[1])
         elif direction == Direction.self:
             return coords
@@ -277,7 +277,7 @@ class Board:
             return d
     
     def NodeMove(self, action): #action is (start, action, target, direction)
-        print(action)
+        print("NEW NODE MADE")
         newBoard = self.clone(self.States, self.player_role)
         newBoard.act[action[1]](self.toCoord(action[0].location), action[3])
         return newBoard
@@ -524,7 +524,7 @@ class Board:
         start_idx = self.toIndex(coords)
         destination_idx = self.toIndex(new_coords)
 
-        print(start_idx, " ", destination_idx)
+        #print(start_idx, " ", destination_idx)
         # Check if the new coordinates are valid
         if not self.isValidCoordinate(new_coords):
             return Result.invalid
