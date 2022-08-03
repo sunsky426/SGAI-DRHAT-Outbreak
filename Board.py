@@ -167,16 +167,12 @@ class Board:
     def getTargetCoords(self, coords: Tuple[int, int], direction: Direction) -> Tuple[int, int]:
         if direction == Direction.up:
             new_coords = (coords[0], coords[1] - 1)
-            #print(f"going from {coords} to new coords {new_coords}")
         elif direction == Direction.down:
             new_coords = (coords[0], coords[1] + 1)
-            #print(f"going from {coords} to new coords {new_coords}")
         elif direction == Direction.left:
             new_coords = (coords[0] - 1, coords[1])
-            #print(f"going from {coords} to new coords {new_coords}")
         elif direction == Direction.right:
             new_coords = (coords[0] + 1, coords[1])
-            #print(f"going from {coords} to new coords {new_coords}")
         elif direction == Direction.self:
             new_coords = coords
 

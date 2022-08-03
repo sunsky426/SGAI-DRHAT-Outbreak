@@ -63,7 +63,7 @@ class State:
     def clone(self): #clones the state (for the purpose of moving people and zombies)
         if self.person is None:
             return State(self.person, self.location)
-        return State(self.person.clone(), self.location)
+        return State(self.person.clone(), self.location, self.safeSpace)
 
     def __eq__(self, __o: object) -> bool: # compares if two states are the same, not just the same person but also the same location
         if type(__o) == State:
