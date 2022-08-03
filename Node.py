@@ -47,7 +47,7 @@ class Node:
         while not current_rollout_state.is_game_over(): #while the node is not a terminal node
             possible_moves = current_rollout_state.get_legal_actions() #get all moves from this node
             action = self.rollout_policy(possible_moves) #select a move using the rollout policy (random by default)
-            current_rollout_state = current_rollout_state.move(action) #change the node to the state after said action is made
+            current_rollout_state = current_rollout_state.NodeMove(action) #change the node to the state after said action is made
         return current_rollout_state.game_result() #loop the above until the game ends, then return the game result
     
     def backpropagate(self, result): #send the information from the node back to the root
@@ -68,7 +68,7 @@ class Node:
 
     def _tree_policy(self): #branches every node
         current_node = self
-        while not current_node.is_terminal_node() and self.age < 7: #while selected node is not the last node
+        while not current_node.is_terminal_node() and self.age < 5: #while selected node is not the last node
             if not current_node.is_fully_expanded(): # if the selected node hasnt been fully expanded, expand it
                 return current_node.expand()
             else:
@@ -116,3 +116,15 @@ class Node:
                 c = Node(i, self, self.state, age = self.age + 1)  # make da node
                 self.children.append(c)  # add child to list
         return self.children  # return list of children (idk if return statement is needed)
+
+    def board_eval(self):
+        zombie_count = 0
+        human_count = 0
+        for state in self.state.States:
+            if state.person is not None:
+                if state.person.isZombie:
+                    zombie_count += 1
+                else:
+                    human_count += 1
+            
+        return (human_count- 0.9*zombie_count - 0.05 * self.state.outrage)

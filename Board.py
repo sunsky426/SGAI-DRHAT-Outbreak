@@ -43,6 +43,7 @@ class Board:
             Action.bite: self.bite,
             Action.kill: self.kill
         }
+    
 
     def num_zombies(self) -> int: #number of zombies on the board, different than population
         r = 0
@@ -267,6 +268,11 @@ class Board:
                 ):
                     d = rd.randint(0, len(self.States))
             return d
+    
+    def NodeMove(self, action): #action is (start, action, target, direction)
+        newBoard = self.clone(self.States, self.player_role)
+        newBoard.act(action[1])
+        return newBoard.act(action[0], action[3])
 
     def bite(self, coords: Tuple[int, int], direction: Direction) -> Result:
         target_coords = self.getTargetCoords(coords, direction)
@@ -298,7 +304,7 @@ class Board:
         ):
             return Result.invalid
         
-        #calculate probability
+        #calculate proNbility
         chance = 100
         target = self.States[target_idx].person
         if target.isVaccinated:
