@@ -18,6 +18,7 @@ class Node:
         #self.untried_actions = None #all possible actions
         self.untried_actions = self.untried_actions()
         self.age = age
+        print(age)
         return
 
     def untried_actions(self): #starts with all possible actions, then is shrunk later in the expand function
@@ -33,9 +34,9 @@ class Node:
         return self.num_visits
     
     def expand(self):
-        start, action, direction, target = self.untried_actions.pop() #takes an action from untried actions
-        next_state = self.state.act[action](self.state.toCoord(start.location), direction) #creates the state after that move happens
-        child_node = Node(next_state, parent=self, parent_action=(start, action, direction, target), age=self.age+1) #creates a node with that state and action as a child of this node
+        start, action, target, direction = self.untried_actions.pop() #takes an action from untried actions
+        next_state = self.state.NodeMove((start, action, target, direction)) #creates the state after that move happens
+        child_node = Node(next_state, parent=self, parent_action=(start, action, target, direction), age=self.age+1) #creates a node with that state and action as a child of this node
         self.children.append(child_node) #adds that node to the children of this node
         return child_node #returns the child node
     
@@ -68,7 +69,7 @@ class Node:
 
     def _tree_policy(self): #branches every node
         current_node = self
-        while not current_node.is_terminal_node() and self.age < 5: #while selected node is not the last node
+        while not current_node.is_terminal_node() and self.age < 3: #while selected node is not the last node
             if not current_node.is_fully_expanded(): # if the selected node hasnt been fully expanded, expand it
                 return current_node.expand()
             else:

@@ -292,10 +292,5 @@ while running:
                     print("loseCase")
                 if event.type == pygame.QUIT:
                     running = False
-Data = Data[0:-1]
 print("Data: ", Data)
 pygame.display.quit()
-
-
-
-

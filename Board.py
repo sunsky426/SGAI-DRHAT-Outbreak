@@ -145,8 +145,9 @@ class Board:
         NB.player_role = role
         return NB
 
-    def gameEnded():
-        return num_zombies() == population or num_zombies() == 0
+    def game_ended(self):
+        return self.num_zombies() == self.population or self.num_zombies() == 0 or self.outrage >= 100
+    
     def isAdjacentTo(self, coord: Tuple[int, int], is_zombie: bool) -> bool: # returns adjacent coordinates containing the same type (so person if person etc)
 
         ret = False
@@ -171,20 +172,25 @@ class Board:
         if direction == Direction.up:
             new_coords = (coords[0], coords[1] - 1)
             print(f"going from {coords} to new coords {new_coords}")
+            return (coords[0], coords[1] - 1)
         elif direction == Direction.down:
             new_coords = (coords[0], coords[1] + 1)
             print(f"going from {coords} to new coords {new_coords}")
+            return (coords[0], coords[1] + 1)
         elif direction == Direction.left:
             new_coords = (coords[0] - 1, coords[1])
             print(f"going from {coords} to new coords {new_coords}")
+            return (coords[0] - 1, coords[1])
         elif direction == Direction.right:
             new_coords = (coords[0] + 1, coords[1])
             print(f"going from {coords} to new coords {new_coords}")
+            return (coords[0] + 1, coords[1])
         elif direction == Direction.self:
-            new_coords = coords
+            return coords
+        print("you ducked up: no direction inputted")
         
         #self.States[self.toIndex(coords)].person.facing = Direction
-        return new_coords
+        #return new_coords
     
     def move(self, coords: Tuple[int, int], direction: Direction) -> Result:
         new_coords = self.getTargetCoords(coords, direction)
@@ -271,8 +277,9 @@ class Board:
             return d
     
     def NodeMove(self, action): #action is (start, action, target, direction)
+        print(action)
         newBoard = self.clone(self.States, self.player_role)
-        newBoard.act[action[1]](action[0], action[3])
+        newBoard.act[action[1]](self.toCoord(action[0].location), action[3])
         return newBoard
 
 
@@ -655,19 +662,19 @@ class Board:
                             result = self.move_validity(target, direction)
                             if not result == Result.invalid:
                                 #if valid, add the action to the list
-                                legal_actions.append((state, Action.move, direction, target))
+                                legal_actions.append((state, Action.move, target, direction))
 
                             #repeat, but with healing
                             result = self.heal_validity(target, direction)
                             if not result == Result.invalid:
                                 #if valid, add the action to the list
-                                legal_actions.append((state, Action.heal, direction, target))
+                                legal_actions.append((state, Action.heal, target, direction))
                         
                             #repeat, but with killing
                             result = self.heal_validity(target, direction)
                             if not result == Result.invalid:
                                 #if valid, add the action to the list
-                                legal_actions.append((state, Action.kill, direction, target))
+                                legal_actions.append((state, Action.kill, target, direction))
 
                 if (self.player_role == Role.zombie 
                     and state.person.isZombie):
@@ -678,12 +685,12 @@ class Board:
                             result = self.move_validity(target, direction)
                             if not result == Result.invalid:
                                 #if valid, add the action to the list
-                                legal_actions.append((state, Action.move, direction, target))
+                                legal_actions.append((state, Action.move, target, direction))
 
                             #repeat, but with biting
                             result = self.bite_validity(target, direction)
                             if not result == Result.invalid:
                                 #if valid, add the action to the list
-                                legal_actions.append((state, Action.bite, direction, target))
+                                legal_actions.append((state, Action.bite, target, direction))
                                 
         return legal_actions
