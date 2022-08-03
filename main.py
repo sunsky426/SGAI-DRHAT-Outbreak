@@ -94,14 +94,12 @@ while running:
                         take_action = []
                     elif action == "ai turn":
                         #pick the AI move
-                        #best_child = root_node.best_action() #find the best child of the root node
                         AiThinking = True
                         BestAct = root_node.best_action().parent_action
                         GameBoard = GameBoard.NodeMove(BestAct)
                         root_node = Node(GameBoard,None, None) # make root note
                         AiThinking = False
                         playerMoved = True
-                        #root_node = best_child
                         print("AI Moved\nMove: ", BestAct[1])
                         
                     elif type(action) is tuple:
