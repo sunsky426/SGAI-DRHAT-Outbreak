@@ -36,7 +36,7 @@ def get_action(GameBoard: Board, pixel_x: int, pixel_y: int):
 
     heal_bite_check = pixel_x >= 900 and pixel_x <= 1100 and pixel_y > 190 and pixel_y < 301
     kill_check = pixel_x >= 800 and pixel_x <= 900 and pixel_y > 199 and pixel_y < 301
-    Med_check = pixel_x >= 800 and pixel_x <= 900 and pixel_y > 306 and pixel_y < 406
+    Med_check = pixel_x >= 800 and pixel_x <= 900 and pixel_y > 301 and pixel_y < 401
     reset_move_check = (
         pixel_x >= RESET_MOVE_COORDS[0]
         and pixel_x <= RESET_MOVE_COORDS[0] + RESET_MOVE_DIMS[0]
@@ -356,19 +356,14 @@ def get_reward(action):
     elif action == Action.bite:
         return -100
 
-def direction(coord1: Tuple[int, int], coord2: Tuple[int, int]):
-    vert_diff = coord2[1] - coord1[1]
-    horz_diff = coord2[0] - coord1[0]
-    print(vert_diff, horz_diff, "diff")
-    if coord2 == coord1:
+def direction(coord1: Tuple[int, int], coord2: Tuple[int, int]):    
+    if coord1 == coord2:
         return Direction.self
-    elif vert_diff**2 > horz_diff**2:
-        if vert_diff > 0:
-            return Direction.down
-        else:
-            return Direction.up
-    else:
-        if horz_diff > 0:
-            return Direction.right
-        else:
-            return Direction.left
+    elif coord2[1] > coord1[1]:
+        return Direction.down
+    elif coord2[1] < coord1[1]:
+        return Direction.up
+    elif coord2[0] > coord1[0]:
+        return Direction.right
+    elif coord2[0] < coord1[0]:
+        return Direction.left
