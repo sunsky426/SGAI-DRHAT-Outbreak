@@ -15,11 +15,10 @@ class Node:
         self.results[1] = 0 #starts with 0 wins
         self.results[-1] = 0  # starts with 0 losses
         self.untried_actions = None #all possible actions
-        self.untried_action()
-        self.gameRunning = True #added variable that says when the game is running
+        self.untried_actions = self.untried_actions()
         return
 
-    def untried_action(self): #starts with all possible actions, then is shrunk later in the expand function
+    def untried_actions(self): #starts with all possible actions, then is shrunk later in the expand function
         self.untried_actions = self.state.get_legal_actions()
         return self.untried_actions
 
@@ -30,7 +29,7 @@ class Node:
 
     def n(self):
         return self.num_visits
-    f
+    
     def expand(self):
         start, action, direction, target = self.untried_actions.pop() #takes an action from untried actions
         next_state = self.state.act[action](start, direction) #creates the state after that move happens
@@ -88,7 +87,7 @@ class Node:
         Either a positive value when humans win, based on how many people remain, or a negative value when zombies win
         """
         reward = 0
-        if not self.gameRunning:
+        if self.game_ended():
             # checks if the game has ended before returning a reward value other than 0
             for s in board.States:
                 # this code has been written based on the assumption that that the state will be defined as Gameboard.states
@@ -97,6 +96,8 @@ class Node:
                 else:
                     # returns a basic value of -10 whenever the zombies win, can be changed later
                     reward = -10
+        else:
+            return self.board_eval()
         return reward
 
     def game_ended(self):
@@ -107,7 +108,7 @@ class Node:
         This is technically "move" but I may write another move function where the AI actually chooses a node,
         since this one just adds all the child nodes to the children array.
         """
-        if self.gameRunning:  # if this node isnt the terminal node
+        if not self.game_ended():  # if this node isnt a terminal node
             for i in self.untried_actions:  # looking through neighboring states and creating nodes off of that
                 c = Node(i, self, self.state)  # make da node
                 self.children.append(c)  # add child to list
