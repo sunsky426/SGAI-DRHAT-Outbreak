@@ -190,4 +190,4 @@ class Node:
                 else:
                     human_count += 1
             
-        return human_count- 0.9*zombie_count - 0.05 * self.state.outrage
+        return (human_count- 0.9*zombie_count - 0.05 * self.state.outrage)
