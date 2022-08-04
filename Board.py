@@ -299,7 +299,6 @@ class Board:
 
     def NodeMove(self, action):  # action is (start, action, direction)
         #print(self.toCoord(action[0].location), " to ", action[2])
-        time.sleep(0.1)
         newBoard = self.clone(self.States, self.player_role)
         newBoard.act[action[1]](self.toCoord(action[0].location), action[2])
         for state in newBoard.States:
@@ -700,7 +699,7 @@ class Board:
                         print(
                             "we arent running ai on zombie but if we wanna later we can add this bit")
 
-        for action in actions:
-            print(action[1], ": ", self.toCoord(
-                action[0].location), " towards ", action[2])
+        #for action in actions:
+        #    print(action[1], ": ", self.toCoord(
+        #        action[0].location), " towards ", action[2])
         return actions

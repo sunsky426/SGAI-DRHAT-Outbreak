@@ -19,6 +19,7 @@ class Node:
         self.untried_actions = self.untried_actions()
         self.age = age
         #print("Age: ", age)
+        self.count = 0
         return
 
     def untried_actions(self): #starts with all possible actions, then is shrunk later in the expand function
@@ -35,24 +36,22 @@ class Node:
     
     def expand(self):
         start, action, direction = self.untried_actions.pop() #takes an action from untried actions
-        #print("Age: ", self.age)
         next_state = self.state.NodeMove((start, action, direction)) #creates the state after that move happens
-        child_node = Node(next_state, parent=self, parent_action=(start, action, direction), age=self.age+1) #creates a node with that state and action as a child of this node
-        print("Age: ", child_node.age)
+        child_node = Node(next_state, parent=self, parent_action=(start, action, direction), age = self.age + 1) #creates a node with that state and action as a child of this node
+        print("Age: ", self.age, child_node.age)
         self.children.append(child_node) #adds that node to the children of this node
         return child_node #returns the child node
     
     def is_terminal_node(self): #checks if this is the last node in the branch
-        return self.state.game_ended() or self.age > 5
+        return self.state.game_ended()
 
     def rollout(self):
         current_rollout_state = self.state 
-        while not current_rollout_state.game_ended: #while the board is not an end board
+        for i in range(20): #while the board is not an end board
             possible_moves = current_rollout_state.get_legal_actions() #get all moves from this node
             action = self.rollout_policy(possible_moves) #select a move using the rollout policy (random by default)
-            print(self.age, " -")
+        #    print(i, " -")
             current_rollout_state = current_rollout_state.NodeMove(action) #change the node to the state after said action is made
-        
         return current_rollout_state.game_result() #loop the above until the game ends, then return the game result
     
     def backpropagate(self, result): #send the information from the node back to the root
@@ -81,13 +80,14 @@ class Node:
         return current_node #in the end, return the best node of all of the children of this node, this is the mcts program basically
     
     def best_action(self): #pretty self explanatory
-        simulation_no = 100  
+        simulation_no = 2000
         for i in range(simulation_no): #creates simulations
             v = self._tree_policy() #makes all the nodes
             reward = v.rollout() #does the moves for all the nodes
-            #print(reward)
+            self.count += 1
+            print(self.count)
             v.backpropagate(reward) #send all the info back to the root
-        return self.best_child(c_param=0.) #return the best node for the root to choose
+        return self.best_child(c_param=0.01) #return the best node for the root to choose
 
     def game_result(self):
         """
