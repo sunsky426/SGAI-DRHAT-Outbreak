@@ -95,12 +95,11 @@ while running:
                         #GameBoard.med()
                         AiThinking = True
                         BestAct = root_node.best_action().parent_action
-                        print(BestAct[1], " ", GameBoard.toCoord(BestAct[0].location), " towards ", BestAct[2], "--------------------------")
+                        print("AI Moved:", BestAct[1], " ", GameBoard.toCoord(BestAct[0].location), " towards ", BestAct[2], "--------------------------")
                         GameBoard = GameBoard.NodeMove(BestAct)
                         root_node = Node(GameBoard,None, None) # make root note
                         playerMoved = True
                         #root_node = best_child
-                        print("AI Moved:", BestAct)
                         
                     elif type(action) is tuple:
                         idx = GameBoard.toIndex(action)

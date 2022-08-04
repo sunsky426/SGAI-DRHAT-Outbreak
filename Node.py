@@ -80,14 +80,14 @@ class Node:
         return current_node #in the end, return the best node of all of the children of this node, this is the mcts program basically
     
     def best_action(self): #pretty self explanatory
-        simulation_no = 2000
+        simulation_no = 5000
         for i in range(simulation_no): #creates simulations
             v = self._tree_policy() #makes all the nodes
             reward = v.rollout() #does the moves for all the nodes
             self.count += 1
             print(self.count)
             v.backpropagate(reward) #send all the info back to the root
-        return self.best_child(c_param=0.01) #return the best node for the root to choose
+        return self.best_child(c_param=0.05) #return the best node for the root to choose
 
     def game_result(self):
         """
